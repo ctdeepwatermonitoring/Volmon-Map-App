@@ -327,16 +327,26 @@ appears from horizontal start (left) of viewport. -->
         })
       );
 
-      let RBVsites, VSTeMsites, CTLWsites; // store layers
+      let RBVsites, RBVWS, VSTeMsites, CTLWsites; // store layers
 
       // fetch data.. data points from WQP, polys from internal data, river lines from integrated report
       // boundary first as it never changes
-      fetch("data/ct_boundary.geojson")
+      fetch("data/ct_boundary.geojson") // also need to make this draw on top of the other layers
         .then(function (response) {
           return response.json();
         })
         .then(function (data) {
           drawBoundary(data); // function for each type of data
+          // return a new fetch call and continue the chain
+          return fetch("data/rbv_watersheds.geojson");
+        })
+        .then(function (response) {
+          return response.json();
+        })
+        .then(function (data) {
+          setActiveTab("RBV"); // active by default
+          RBVWS = drawRBVWS(data);
+          RBVWS.addTo(map); // display by default
           // return a new fetch call and continue the chain
           return fetch("data/RBVmetrics.geojson");
         })
@@ -345,7 +355,6 @@ appears from horizontal start (left) of viewport. -->
         })
         .then(function (data) {
           RBVsites = drawRBV(data);
-          setActiveTab("RBV"); // active by default
           RBVsites.addTo(map); // display by default
           // return a new fetch call and continue the chain
           return fetch("data/VSTeMclasses.geojson");
@@ -408,6 +417,25 @@ appears from horizontal start (left) of viewport. -->
         return RBVsites; // return the RBVsites layer
       }
 
+      //rbv high prio watersheds
+      function drawRBVWS(data) {
+        const RBVWS = L.geoJson(data, {
+          style: function (feature, latlng) {
+            return (
+              latlng,
+              {
+                fillColor: "#9ECF7C",
+                color: "#9ECF7C",
+                weight: 2,
+                opacity: 1,
+                fillOpacity: 1,
+              }
+            );
+          },
+        });
+        return RBVWS; // return the RBVWS layer
+      }
+
       // VSTeM sites with color coding
       function drawVSTeM(data) {
         const VSTeMsites = L.geoJson(data, {
@@ -459,6 +487,7 @@ appears from horizontal start (left) of viewport. -->
       // tab functionality: RBV.. can i make this more efficient and do all at once?
       document.querySelector("#RBV").addEventListener("click", function () {
         RBVsites.addTo(map); // I think I can very easily add/remove a bunch of layers here
+        RBVWS.addTo(map);
 
         if (VSTeMsites) {
           map.removeLayer(VSTeMsites);
@@ -478,6 +507,9 @@ appears from horizontal start (left) of viewport. -->
         if (RBVsites) {
           map.removeLayer(RBVsites);
         }
+        if (RBVWS) {
+          map.removeLayer(RBVWS);
+        }
         if (CTLWsites) {
           map.removeLayer(CTLWsites);
         }
@@ -491,6 +523,9 @@ appears from horizontal start (left) of viewport. -->
 
         if (RBVsites) {
           map.removeLayer(RBVsites);
+        }
+        if (RBVWS) {
+          map.removeLayer(RBVWS);
         }
         if (VSTeMsites) {
           map.removeLayer(VSTeMsites);
