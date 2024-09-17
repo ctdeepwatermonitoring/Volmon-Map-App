@@ -329,6 +329,8 @@ appears from horizontal start (left) of viewport. -->
         })
       );
 
+      let RBVsites, VSTeMsites; // store layers
+
       // fetch data.. data points from WQP, polys from internal data, river lines from integrated report
       // boundary first as it never changes
       fetch("data/ct_boundary.geojson")
@@ -336,8 +338,7 @@ appears from horizontal start (left) of viewport. -->
           return response.json();
         })
         .then(function (data) {
-          console.log(data);
-          drawBoundary(data);
+          drawBoundary(data); // function for each type of data
           // return a new fetch call and continue the chain
           return fetch("data/RBVmetrics.geojson");
         })
@@ -345,17 +346,17 @@ appears from horizontal start (left) of viewport. -->
           return response.json();
         })
         .then(function (data) {
-          console.log(data);
-          drawRBV(data); // function for each type of data
-        // return a new fetch call and continue the chain
-        return fetch("data/VSTeMclasses.geojson");
+          RBVsites = drawRBV(data); 
+          setActiveTab('RBV'); // active by default
+          RBVsites.addTo(map); // display by default
+          // return a new fetch call and continue the chain
+          return fetch("data/VSTeMclasses.geojson");
         })
         .then(function (response) {
           return response.json();
         })
         .then(function (data) {
-          console.log(data);
-          drawVSTeM(data); // function for each type of data
+          VSTeMsites = drawVSTeM(data); 
         });
 
       // i am going to create functions for drawing each "type" of data, then figure out how to link interactivity to the tabs
@@ -375,9 +376,9 @@ appears from horizontal start (left) of viewport. -->
 
       // rbv sites with color coding
       function drawRBV(data) {
-        const RBVsites = L.geoJson(data, { // i think i will group the data  by the const and tie it to the tabs?
+        const RBVsites = L.geoJson(data, {
+          // i think i will group the data  by the const and tie it to the tabs?
           pointToLayer: function (feature, latlng) {
-
             // either 4+ site or <4 site
             const maxScore = feature.properties.MaxScore;
             let color;
@@ -387,7 +388,8 @@ appears from horizontal start (left) of viewport. -->
               color = "#0D2D6C";
             }
 
-            return L.circleMarker(latlng, { // i may make this a nicer symbol? but this looks not bad to start
+            return L.circleMarker(latlng, {
+              // i may make this a nicer symbol? but this looks not bad to start
               radius: 6,
               fillColor: color,
               color: color,
@@ -396,24 +398,26 @@ appears from horizontal start (left) of viewport. -->
               fillOpacity: 0.8,
             });
           },
-        }).addTo(map);
+        }); // .addTo(map); // control this separately
+        return RBVsites; // return the RBVsites layer
       }
 
       // VSTeM sites with color coding
       function drawVSTeM(data) {
-        const VSTeM = L.geoJson(data, { 
+        const VSTeMsites = L.geoJson(data, {
           pointToLayer: function (feature, latlng) {
-
             // either cold or not cold site (for now)
             const minScore = feature.properties.MinClassScore;
             let color;
             if (minScore == 1) {
+              // my coldwater site classification
               color = "#00AAE7";
             } else {
               color = "#FFED46";
             }
 
-            return L.circleMarker(latlng, { // temp symbology to differentiate from rbv sites
+            return L.circleMarker(latlng, {
+              // temp symbology to differentiate from rbv sites
               radius: 3,
               fillColor: color,
               color: color,
@@ -422,9 +426,46 @@ appears from horizontal start (left) of viewport. -->
               fillOpacity: 0.8,
             });
           },
-        }).addTo(map);
+        });
+        return VSTeMsites;
       }
 
+      // tab magic
+
+      // tab functionality: RBV.. can i make this more efficient and do all at once?
+      document.querySelector("#RBV").addEventListener("click", function () {
+        RBVsites.addTo(map); // I think I can very easily add/remove a bunch of layers here
+
+        if (VSTeMsites) {
+          map.removeLayer(VSTeMsites);
+        }
+        setActiveTab("RBV");
+        // also need to make this work for each map legend
+      });
+
+      // tab functionality: VSTeM
+      document.querySelector("#VSTeM").addEventListener("click", function () {
+        VSTeMsites.addTo(map); //
+
+        if (RBVsites) {
+          map.removeLayer(RBVsites);
+        }
+        setActiveTab("VSTeM");
+      });
+
+      function setActiveTab(tabID) {
+        // grab all tabs
+        const tabs = document.querySelectorAll(".tab");
+        // remove active class so only selected tab is active
+        tabs.forEach((tab) => {
+          tab.classList.remove("active");
+        });
+        // add active class
+        const activeTab = document.querySelector(`#${tabID}`);
+        if (activeTab) {
+          activeTab.classList.add("active");
+        }
+      }
 
       // footer content
       function setDate() {
