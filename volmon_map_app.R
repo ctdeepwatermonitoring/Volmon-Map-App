@@ -64,6 +64,10 @@ RBV_sf <- RBV_pivot %>%
   st_as_sf(coords = c("LongitudeMeasure", "LatitudeMeasure"), crs = 4326)
 st_write(RBV_sf, "RBVmetrics.geojson", driver = "GeoJSON") # export as geojson!
 
+#rbv high priority watersheds layer
+rbv_watersheds <- read_sf(dsn = ".", layer = "NHDCatchments_ModMMI_75andHigher") # this is whats on the current arcgis map
+st_write(rbv_watersheds, "rbv_watersheds.geojson", driver = "GeoJSON") # export as geojson!
+
 ############vstem data##########################################################
 
 vstem <- read.csv("https://www.waterqualitydata.us/data/Result/search?project=CT-VOLMON-VSTEM&mimeType=csv&zip=no&dataProfile=resultPhysChem&providers=NWIS&providers=STORET")
@@ -95,5 +99,12 @@ st_write(vstem_sf , "VSTeMclasses.geojson", driver = "GeoJSON") # export as geoj
 ############ct lake watch data##########################################################
 
 ctlw <- read.csv("https://www.waterqualitydata.us/data/Station/search?project=CTLakeWatch&project=Connecticut%20Lake%20Watch&mimeType=csv&zip=no&providers=NWIS&providers=STORET")
-
-ctlw <- 
+ctlw <- ctlw[!duplicated(ctlw[c("MonitoringLocationName")]), ] # different data source so this is the important identifier
+ctlw <- ctlw[c("MonitoringLocationName", "MonitoringLocationIdentifier", "LatitudeMeasure",
+               "LongitudeMeasure")] # no result info/site category (for now!)
+ctlw_sf <- ctlw %>%
+  st_as_sf(coords = c("LongitudeMeasure", "LatitudeMeasure"), crs = 4326)
+st_write(ctlw_sf , "CTLWsites.geojson", driver = "GeoJSON") # export as geojson!
+  
+  
+  
