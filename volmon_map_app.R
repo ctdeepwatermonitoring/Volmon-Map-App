@@ -15,7 +15,8 @@ mapview(ct_boundary) #check it looks right
 
 st_write(ct_boundary, "ct_boundary.geojson", driver = "GeoJSON") # export as geojson!
 
-#RBV results portion
+############RBV data############################################################
+
 RBV <- read.csv("https://www.waterqualitydata.us/data/ActivityMetric/search?project=CT-VOLMON-RBV&mimeType=csv&zip=no&providers=NWIS&providers=STORET")
 RBVstations <- read.csv("https://www.waterqualitydata.us/data/Station/search?project=CT-VOLMON-RBV&mimeType=csv&zip=no&providers=NWIS&providers=STORET")
 RBVactivity <- read.csv("https://www.waterqualitydata.us/data/Activity/search?project=CT-VOLMON-RBV&mimeType=csv&zip=no&dataProfile=activityAll&providers=NWIS&providers=STORET")
@@ -62,3 +63,17 @@ RBV_pivot <- RBV_pivot[c("MonitoringLocationIdentifier", "MonitoringLocationName
 RBV_sf <- RBV_pivot %>%
   st_as_sf(coords = c("LongitudeMeasure", "LatitudeMeasure"), crs = 4326)
 st_write(RBV_sf, "RBVmetrics.geojson", driver = "GeoJSON") # export as geojson!
+
+############vstem data##########################################################
+
+vstem <- read.csv("https://www.waterqualitydata.us/data/Result/search?project=CT-VOLMON-VSTEM&mimeType=csv&zip=no&dataProfile=resultPhysChem&providers=NWIS&providers=STORET")
+colnames(vstem)
+vstem <- vstem[c("MonitoringLocationIdentifier", "MonitoringLocationName", 
+                 "ActivityLocation.LatitudeMeasure",  "ActivityLocation.LongitudeMeasure", "ResultCommentText")]
+vstem$numericclass <- NA
+vstem$numericclass <- ifelse(vstem$ResultCommentText == "Summer Class = COLD", 1, vstem$numericclass)
+vstem$numericclass <- ifelse(vstem$ResultCommentText == "Summer Class = Cool", 2, vstem$numericclass)
+vstem$numericclass <- ifelse(vstem$ResultCommentText == "Summer Class = WARM", 3, vstem$numericclass)
+
+
+
