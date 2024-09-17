@@ -46,6 +46,15 @@
         line-height: 1.7rem;
       }
 
+      a {
+        color: #fdb515;
+      }
+
+      a:hover {
+        color: #ffed46;
+        text-decoration: none;
+      }
+
       #map {
         /* height is set in JS */
         background: #494848;
@@ -83,12 +92,63 @@
         text-decoration: none;
       }
 
-      .leaflet-bar a {
-        /* Override the default style for Leaflet's zoom  */
-        background: rgba(100, 100, 100, 0.9);
-        color: rgba(244, 244, 244, 0.8);
+      header.bg-dark {
+        background-color: #0d2d6c !important; /* lazy way of modifying bootstrap css */
+      }
+      footer.bg-dark {
+        background-color: #00aae7 !important;
       }
 
+      .btn-custom {
+        background-color: #00aae7;
+        color: white;
+        border: 0.5px solid white;
+      }
+
+      .btn-custom:hover {
+        background-color: #68cef2;
+        color: white;
+        border: 0.5px solid white;
+      }
+
+      .offcanvas-body {
+        background-color: #0d2d6c !important;
+      }
+
+      .offcanvas-header {
+        background-color: #0d2d6c !important;
+      }
+
+      .leaflet-bar a {
+        /* Override the default style for Leaflet's zoom  */
+        background: #0d2d6c;
+        color: #fff;
+      }
+
+      .tab-container {
+        margin-bottom: 0; 
+        padding: 0; 
+      }
+
+      .tab {
+        background-color: #fff;
+        color: #0d2d6c;
+        border: 1px solid #0d2d6c;
+        padding: 0.5rem 1rem;
+        cursor: pointer;
+        font-size: 1rem;
+        margin-right: 5px;
+        margin-top: 0;     /* Remove top margin to be flush with the map */
+        transition: background-color 0.3s;
+      }
+
+      .tab:hover {
+        background-color: #68cef2;
+      }
+
+      .tab.active {
+        border: 1px solid #fff; /* illusion of it being flush with the map like file tabs */
+      }
 
       /* Small devices (landscape phones, 576px and up) */
       @media (min-width: 576px) {
@@ -115,8 +175,15 @@
       <header class="row bg-dark text-white p-2">
         <!-- Span 8 of 12 columns-->
         <div class="col-8">
-          <h1>Volunteer Monitoring Mapping Application</h1>
+          <h1>
+            <img
+              src="/graphics/DEEP_Primary_Seal_Reverse_150px.png"
+              width="70px"
+            />
+            Volunteer Monitoring Mapping Application
+          </h1>
         </div>
+
         <!-- Span 4 of 12 columns align content center vertically. -->
         <div class="col-4 align-self-center">
           <!-- Flexible container 
@@ -125,8 +192,9 @@
             <!-- Link styled as button 
         with data-bs-toggle attribute that activates an off-canvas element.
         When clicked, element with #offcanvasExample is displayed. -->
-            <a
-              class="btn btn-primary"
+
+        <a
+              class="btn btn-custom"
               data-bs-toggle="offcanvas"
               href="#offcanvasExample"
               role="button"
@@ -135,6 +203,11 @@
               Map Info
             </a>
           </p>
+          <div class="tab-container">
+            <button id="RBV" class="tab">RBV</button>
+            <button id="VSTeM" class="tab">VSTeM</button>
+            <button id="CTLW" class="tab">CTLW</button>
+          </div>
         </div>
       </header>
 
