@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <title>Volmon Map App</title>
+    <!-- Bootstrap CSS first -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
+      integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65"
+      crossorigin="anonymous"
+    />
+    <!-- Then Leaflet CSS -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
+      integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI="
+      crossorigin=""
+    />
+    <!-- Finally, our styles -->
+    <style>
+      body {
+        background: #20282e;
+        font-family: "Open Sans", sans-serif;
+        font-weight: 400;
+        font-size: 100%;
+      }
+
+      footer {
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        height: 3rem;
+      }
+
+      h1 {
+        font-weight: 500;
+        font-size: 250%;
+      }
+
+      p {
+        line-height: 1.7rem;
+      }
+
+      #map {
+        /* height is set in JS */
+        background: #494848;
+      }
+
+      .legend {
+        font-size: 1rem;
+        border-radius: 5px;
+        max-width: 200px;
+        font-family: "Open Sans", sans-serif;
+        background: rgba(100, 100, 100, 0.9);
+        color: rgba(244, 244, 244, 0.8);
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+      }
+
+      .legend h3 {
+        font-size: 1.1em;
+        font-weight: normal;
+        color: #ddd;
+        margin: 0 0 10px 0;
+      }
+
+      .legend span {
+        width: 20px;
+        height: 20px;
+        margin: 0 10px 4px 0;
+      }
+
+      .legend label {
+        font-size: 0.9rem;
+      }
+
+      a:hover {
+        color: rgb(130, 131, 132);
+        text-decoration: none;
+      }
+
+      .leaflet-bar a {
+        /* Override the default style for Leaflet's zoom  */
+        background: rgba(100, 100, 100, 0.9);
+        color: rgba(244, 244, 244, 0.8);
+      }
+
+
+      /* Small devices (landscape phones, 576px and up) */
+      @media (min-width: 576px) {
+      }
+
+      /* Medium devices (tablets, 768px and up) */
+      @media (min-width: 768px) {
+      }
+
+      /* Large devices (desktops, 992px and up) */
+      @media (min-width: 992px) {
+      }
+
+      /* Extra large devices (large desktops, 1200px and up) */
+      @media (min-width: 1200px) {
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- Container is full width of viewport -->
+    <div class="container-fluid">
+      <!-- Row with dark background and white text with 0.5rem padding on all sides -->
+      <header class="row bg-dark text-white p-2">
+        <!-- Span 8 of 12 columns-->
+        <div class="col-8">
+          <h1>Volunteer Monitoring Mapping Application</h1>
+        </div>
+        <!-- Span 4 of 12 columns align content center vertically. -->
+        <div class="col-4 align-self-center">
+          <!-- Flexible container 
+      content aligns to horizontal end (right) and center vertically. -->
+          <p class="d-flex justify-content-end my-auto">
+            <!-- Link styled as button 
+        with data-bs-toggle attribute that activates an off-canvas element.
+        When clicked, element with #offcanvasExample is displayed. -->
+            <a
+              class="btn btn-primary"
+              data-bs-toggle="offcanvas"
+              href="#offcanvasExample"
+              role="button"
+              aria-controls="offcanvasExample"
+            >
+              Map Info
+            </a>
+          </p>
+        </div>
+      </header>
+
+      <!-- full-width row with 0 padding -->
+      <section class="row">
+        <div class="p-0">
+          <!-- Map container with height dynamically calc'd in JS. -->
+          <div id="map"></div>
+        </div>
+      </section>
+
+      <!-- Full-width row with similar style as header. -->
+      <footer class="row bg-dark text-white p-2">
+        <!-- Content dynamically generated in JS. -->
+        <p class="text-center"></p>
+      </footer>
+    </div>
+
+    <!-- Off-canvas element outside of container
+appears from horizontal start (left) of viewport. -->
+    <div
+      class="offcanvas offcanvas-start bg-dark text-white"
+      tabindex="-1"
+      id="offcanvasExample"
+      aria-labelledby="offcanvasExampleLabel"
+    >
+      <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="offcanvasExampleLabel">Map Info</h5>
+        <!-- Button to close off-canvas element. -->
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="offcanvas"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="offcanvas-body">
+        <h3 class="py-2">subtitle</h3>
+        <p>
+          A fan brush is a fantastic piece of equipment. Use it. Make friends
+          with it. We're not trying to teach you a thing to copy. We're just
+          here to teach you a technique, then let you loose into the world.
+          We'll put a happy little sky in here.
+        </p>
+        <hr />
+        <ul class="list-unstyled">
+          <li>authored by <a href="#">NAME</a></li>
+          <li>Date of authored map</li>
+          <li>data source: <a href="#">data source</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Bootstrap JS first-->
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4"
+      crossorigin="anonymous"
+    ></script>
+    <!-- Then Leaflet JS -->
+    <script
+      src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
+      integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM="
+      crossorigin=""
+    ></script>
+    <script>
+      // Add footer date
+      setDate();
+
+      // set global variables for header, map container, and footer
+      const header = document.querySelector("header");
+      const mapContainer = document.querySelector("#map");
+      const footer = document.querySelector("footer");
+
+      // set map height to fill window
+      mapContainer.style.height =
+        window.innerHeight - header.offsetHeight - footer.offsetHeight + "px";
+
+      // initial Leaflet map options
+      const options = {
+        center: [41.6, -72.6736],
+        zoom: 9.5,
+        zoomSnap: 0.1,
+        zoomControl: false,
+        attributionControl: false,
+      };
+
+      // create Leaflet map and apply options
+      const map = L.map("map", options);
+
+      // request a basemap tile layer and add to the map
+      var Stadia_StamenTonerLite = L.tileLayer(
+        "https://tiles.stadiamaps.com/tiles/stamen_toner_lite/{z}/{x}/{y}{r}.{ext}",
+        {
+          minZoom: 0,
+          maxZoom: 20,
+          attribution:
+            '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://www.stamen.com/" target="_blank">Stamen Design</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+          ext: "png",
+        }
+      );
+      Stadia_StamenTonerLite.addTo(map);
+
+      // add zoom control
+      map.addControl(
+        L.control.zoom({
+          position: "topright",
+        })
+      );
+
+      // Example of dynamically adding content to page
+      function setDate() {
+        const date = new Date();
+        const year = date.getFullYear();
+        const month = date.toLocaleString("default", {
+          month: "long",
+        });
+        const footerText = document.querySelector("footer p");
+        footerText.innerHTML = `${month}, ${year} | CT DEEP Water Monitoring`;
+      }
+    </script>
+  </body>
+</html>
