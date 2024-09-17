@@ -330,25 +330,29 @@ appears from horizontal start (left) of viewport. -->
       );
 
       // fetch data.. data points from WQP, polys from internal data, river lines from integrated report
+      // boundary first as it never changes
       fetch("data/ct_boundary.geojson")
-        // after it is returned...
         .then(function (response) {
-          // Parse the JSON into a useable format, then return it
           return response.json();
         })
         .then(function (data) {
-          // This is the JSON from our response
-          // console.log parameters first.
           console.log(data);
-          // call draw map and send data as parameter
           drawBoundary(data);
-          // Return a new fetch call and continue the chain
+          // return a new fetch call and continue the chain
+          return fetch("data/RBVmetrics.geojson");
+        })
+        .then(function (response) {
+          return response.json();
+        })
+        .then(function (data) {
+          drawRBV(data); // function for each type of data
         });
 
+      // i am going to create functions for drawing each "type" of data, then figure out how to link interactivity to the tabs
+
+      // boundary data - this never changes
       function drawBoundary(data) {
-        // create Leaflet data layer and add to map
         const ctBoundary = L.geoJson(data, {
-          // boundary styling which will not change between maps
           style: function (feature) {
             return {
               color: "#000",
@@ -358,6 +362,35 @@ appears from horizontal start (left) of viewport. -->
           },
         }).addTo(map);
       }
+
+      // rbv sites with color coding
+      function drawRBV(data) {
+        const RBVsites = L.geoJson(data, { // i think i will group the data  by the const and tie it to the tabs?
+          pointToLayer: function (feature, latlng) {
+
+            // either 4+ site or <4 site
+            const maxScore = feature.properties.MaxScore;
+            let color;
+            if (maxScore >= 4) {
+              color = "#FDB515";
+            } else {
+              color = "#0D2D6C";
+            }
+
+            return L.circleMarker(latlng, { // i may make this a nicer symbol? but this looks not bad to start
+              radius: 6,
+              fillColor: color,
+              color: color,
+              weight: 2,
+              opacity: 1,
+              fillOpacity: 0.8,
+            });
+          },
+        }).addTo(map);
+      }
+
+
+
 
       // footer content
       function setDate() {
