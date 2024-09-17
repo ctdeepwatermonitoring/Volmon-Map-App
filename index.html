@@ -327,7 +327,7 @@ appears from horizontal start (left) of viewport. -->
         })
       );
 
-      let RBVsites, RBVWS, VSTeMsites, CTLWsites; // store layers
+      let RBVsites, RBVWS, VSTeMsites, CWWS, CTLWsites; // store layers
 
       // fetch data.. data points from WQP, polys from internal data, river lines from integrated report
       // boundary first as it never changes
@@ -357,6 +357,14 @@ appears from horizontal start (left) of viewport. -->
           RBVsites = drawRBV(data);
           RBVsites.addTo(map); // display by default
           // return a new fetch call and continue the chain
+          return fetch("data/coldwatersites_us_drainage.geojson");
+        })
+        .then(function (response) {
+          return response.json();
+        })
+        .then(function (data) {
+          CWWS = drawCWWS(data);
+          // return a new fetch call and continue the chain
           return fetch("data/VSTeMclasses.geojson");
         })
         .then(function (response) {
@@ -365,6 +373,7 @@ appears from horizontal start (left) of viewport. -->
         .then(function (data) {
           VSTeMsites = drawVSTeM(data);
           // return a new fetch call and continue the chain
+
           return fetch("data/CTLWsites.geojson");
         })
         .then(function (response) {
@@ -426,11 +435,15 @@ appears from horizontal start (left) of viewport. -->
               {
                 fillColor: "#9ECF7C",
                 color: "#9ECF7C",
-                weight: 2,
-                opacity: 1,
-                fillOpacity: 1,
+                weight: 0,
+                opacity: 0,
+                fillOpacity: 0.8,
               }
             );
+            // send layer to back
+            layer.on("add", function () {
+              layer.bringToBack();
+            });
           },
         });
         return RBVWS; // return the RBVWS layer
@@ -464,6 +477,25 @@ appears from horizontal start (left) of viewport. -->
         return VSTeMsites;
       }
 
+      //rbv high prio watersheds
+      function drawCWWS(data) {
+        const CWWS = L.geoJson(data, {
+          style: function (feature, latlng) {
+            return (
+              latlng,
+              {
+                fillColor: "#00AAE7",
+                color: "#00AAE7",
+                weight: 0,
+                opacity: 0,
+                fillOpacity: 0.8,
+              }
+            );
+          },
+        });
+        return CWWS; // return the CWWS layer
+      }
+
       // CTLW sites with static colors
       function drawCTLW(data) {
         const CTLWsites = L.geoJson(data, {
@@ -492,6 +524,9 @@ appears from horizontal start (left) of viewport. -->
         if (VSTeMsites) {
           map.removeLayer(VSTeMsites);
         }
+        if (CWWS) {
+          map.removeLayer(CWWS);
+        }
         if (CTLWsites) {
           map.removeLayer(CTLWsites);
         }
@@ -503,6 +538,7 @@ appears from horizontal start (left) of viewport. -->
       // tab functionality: VSTeM
       document.querySelector("#VSTeM").addEventListener("click", function () {
         VSTeMsites.addTo(map);
+        CWWS.addTo(map);
 
         if (RBVsites) {
           map.removeLayer(RBVsites);
@@ -530,7 +566,9 @@ appears from horizontal start (left) of viewport. -->
         if (VSTeMsites) {
           map.removeLayer(VSTeMsites);
         }
-
+        if (CWWS) {
+          map.removeLayer(CWWS);
+        }
         setActiveTab("CTLW");
       });
 
