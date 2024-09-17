@@ -30,13 +30,6 @@
         font-size: 100%;
       }
 
-      footer {
-        position: fixed;
-        bottom: 0;
-        width: 100%;
-        height: 3rem;
-      }
-
       h1 {
         font-weight: 500;
         font-size: 250%;
@@ -55,9 +48,91 @@
         text-decoration: none;
       }
 
+      a:hover {
+        color: rgb(130, 131, 132);
+        text-decoration: none;
+      }
+
+      header { /* need to check in with boyd about aligning these elements in a less stupid way */
+        display: flex;
+        color: #fff;
+        width: 100%;
+        justify-content: space-between;
+        align-items: flex-end;
+        background-color: #0d2d6c;
+        padding-left: 10px;
+        padding-top: 11px;
+      }
+
+      footer {
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        padding-top: 5px;
+        height: 2.5rem;
+        background-color: #00aae7;
+        color: #fff;
+        display: flex;
+        justify-content: center;
+      }
+
+      .btn-custom { /* i want button right aligned, centered with respect to the vertical axis */
+        background-color: #00aae7;
+        color: white;
+        border: 0.5px solid white;
+        margin-right: 15px;
+        margin-bottom: 23px; 
+      }
+
+      .btn-custom:hover {
+        background-color: #68cef2;
+        color: white;
+        border: 0.5px solid white;
+      }
+
+      .offcanvas-body {
+        background-color: #0d2d6c !important;
+      }
+
+      .offcanvas-header {
+        background-color: #0d2d6c !important;
+      }
+
+      .leaflet-bar a {
+        /* Override the default style for Leaflet's zoom  */
+        background: #0d2d6c;
+        color: #fff;
+      }
+
+      .tab-container { /* i want my tabs to be flush with bottom of header, padded right from map info button */
+        margin-bottom: 0;
+        padding: 0;
+      }
+
+      .tab {
+        /* tabs will control layer visibility, illusion of being separate maps */
+        background-color: #fff;
+        color: #0d2d6c;
+        border: 2px solid #0d2d6c;
+        padding: 0.5rem 1rem;
+        cursor: pointer;
+        font-size: 1rem;
+        margin-right: 5px;
+        transition: background-color 0.3s;
+      }
+
+      .tab:hover {
+        background-color: #fdb515;
+      }
+
+      .tab.active {
+        border: 2px solid #fff; /* illusion of it being flush with the map like file tabs when active */
+      }
+
       #map {
         /* height is set in JS */
         background: #494848;
+        z-index: 0; /*keeps it behind headers/footers*/
       }
 
       .legend {
@@ -87,69 +162,6 @@
         font-size: 0.9rem;
       }
 
-      a:hover {
-        color: rgb(130, 131, 132);
-        text-decoration: none;
-      }
-
-      header.bg-dark {
-        background-color: #0d2d6c !important; /* lazy way of modifying bootstrap css */
-      }
-      footer.bg-dark {
-        background-color: #00aae7 !important;
-      }
-
-      .btn-custom {
-        background-color: #00aae7;
-        color: white;
-        border: 0.5px solid white;
-      }
-
-      .btn-custom:hover {
-        background-color: #68cef2;
-        color: white;
-        border: 0.5px solid white;
-      }
-
-      .offcanvas-body {
-        background-color: #0d2d6c !important;
-      }
-
-      .offcanvas-header {
-        background-color: #0d2d6c !important;
-      }
-
-      .leaflet-bar a {
-        /* Override the default style for Leaflet's zoom  */
-        background: #0d2d6c;
-        color: #fff;
-      }
-
-      .tab-container {
-        margin-bottom: 0; 
-        padding: 0; 
-      }
-
-      .tab {
-        background-color: #fff;
-        color: #0d2d6c;
-        border: 1px solid #0d2d6c;
-        padding: 0.5rem 1rem;
-        cursor: pointer;
-        font-size: 1rem;
-        margin-right: 5px;
-        margin-top: 0;     /* Remove top margin to be flush with the map */
-        transition: background-color 0.3s;
-      }
-
-      .tab:hover {
-        background-color: #68cef2;
-      }
-
-      .tab.active {
-        border: 1px solid #fff; /* illusion of it being flush with the map like file tabs */
-      }
-
       /* Small devices (landscape phones, 576px and up) */
       @media (min-width: 576px) {
       }
@@ -169,62 +181,46 @@
   </head>
 
   <body>
-    <!-- Container is full width of viewport -->
-    <div class="container-fluid">
-      <!-- Row with dark background and white text with 0.5rem padding on all sides -->
-      <header class="row bg-dark text-white p-2">
-        <!-- Span 8 of 12 columns-->
-        <div class="col-8">
-          <h1>
-            <img
-              src="/graphics/DEEP_Primary_Seal_Reverse_150px.png"
-              width="70px"
-            />
-            Volunteer Monitoring Mapping Application
-          </h1>
-        </div>
+    <header>
+      <h1>
+        <img src="/graphics/DEEP_Primary_Seal_Reverse_150px.png" width="70px" />
+        Volunteer Monitoring Mapping Application
+      </h1>
 
-        <!-- Span 4 of 12 columns align content center vertically. -->
-        <div class="col-4 align-self-center">
-          <!-- Flexible container 
-      content aligns to horizontal end (right) and center vertically. -->
-          <p class="d-flex justify-content-end my-auto">
-            <!-- Link styled as button 
-        with data-bs-toggle attribute that activates an off-canvas element.
-        When clicked, element with #offcanvasExample is displayed. -->
+      <div class="tab-container">
+        <button id="RBV" class="tab">Riffle Bioassessment by Volunteers</button>
+        <button id="VSTeM" class="tab">
+          Volunteer Stream Temperature Monitoring
+        </button>
+        <button id="CTLW" class="tab">CT Lake Watch</button>
+      </div>
 
+      <div class="header-info">
         <a
-              class="btn btn-custom"
-              data-bs-toggle="offcanvas"
-              href="#offcanvasExample"
-              role="button"
-              aria-controls="offcanvasExample"
-            >
-              Map Info
-            </a>
-          </p>
-          <div class="tab-container">
-            <button id="RBV" class="tab">RBV</button>
-            <button id="VSTeM" class="tab">VSTeM</button>
-            <button id="CTLW" class="tab">CTLW</button>
-          </div>
-        </div>
-      </header>
+          class="btn btn-custom"
+          data-bs-toggle="offcanvas"
+          href="#offcanvasExample"
+          role="button"
+          aria-controls="offcanvasExample"
+        >
+          Map Info
+        </a>
+      </div>
+    </header>
 
-      <!-- full-width row with 0 padding -->
-      <section class="row">
-        <div class="p-0">
-          <!-- Map container with height dynamically calc'd in JS. -->
-          <div id="map"></div>
-        </div>
-      </section>
+    <!-- full-width row with 0 padding -->
+    <section class="row">
+      <div class="p-0">
+        <!-- Map container with height dynamically calc'd in JS. -->
+        <div id="map"></div>
+      </div>
+    </section>
 
-      <!-- Full-width row with similar style as header. -->
-      <footer class="row bg-dark text-white p-2">
-        <!-- Content dynamically generated in JS. -->
-        <p class="text-center"></p>
-      </footer>
-    </div>
+    <!-- Full-width row with similar style as header. -->
+    <footer>
+      <!-- Content dynamically generated in JS. -->
+      <p class="text-center"></p>
+    </footer>
 
     <!-- Off-canvas element outside of container
 appears from horizontal start (left) of viewport. -->
