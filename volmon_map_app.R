@@ -68,12 +68,28 @@ st_write(RBV_sf, "RBVmetrics.geojson", driver = "GeoJSON") # export as geojson!
 
 vstem <- read.csv("https://www.waterqualitydata.us/data/Result/search?project=CT-VOLMON-VSTEM&mimeType=csv&zip=no&dataProfile=resultPhysChem&providers=NWIS&providers=STORET")
 colnames(vstem)
-vstem <- vstem[c("MonitoringLocationIdentifier", "MonitoringLocationName", 
-                 "ActivityLocation.LatitudeMeasure",  "ActivityLocation.LongitudeMeasure", "ResultCommentText")]
+
 vstem$numericclass <- NA
 vstem$numericclass <- ifelse(vstem$ResultCommentText == "Summer Class = COLD", 1, vstem$numericclass)
+vstem$numericclass <- ifelse(vstem$ResultCommentText == "COLD", 1, vstem$numericclass)
+vstem$numericclass <- ifelse(vstem$ResultCommentText == "Summer Class = Cool", 2, vstem$numericclass)
+vstem$numericclass <- ifelse(vstem$ResultCommentText == "Cool (Transitional)", 2, vstem$numericclass)
 vstem$numericclass <- ifelse(vstem$ResultCommentText == "Summer Class = Cool", 2, vstem$numericclass)
 vstem$numericclass <- ifelse(vstem$ResultCommentText == "Summer Class = WARM", 3, vstem$numericclass)
+vstem$numericclass <- ifelse(vstem$ResultCommentText == "WARM", 3, vstem$numericclass)
+vstem$numericclass <- as.numeric(vstem$numericclass)
 
+vstem_classes <- vstem %>%
+  group_by(MonitoringLocationIdentifier) %>%
+  summarize(MinClassScore = min(numericclass, na.rm = TRUE)) #I want to have unique sites and keep the coolest class result
+
+vstem_sites <- vstem[!duplicated(vstem[c("MonitoringLocationIdentifier")]), ]
+
+vstem <- merge(vstem_sites, vstem_classes, by = "MonitoringLocationIdentifier")
+vstem <- vstem[c("MonitoringLocationIdentifier", "MonitoringLocationName", 
+                 "ActivityLocation.LatitudeMeasure",  "ActivityLocation.LongitudeMeasure", "MinClassScore")]
+vstem_sf <- vstem %>%
+  st_as_sf(coords = c("ActivityLocation.LongitudeMeasure", "ActivityLocation.LatitudeMeasure"), crs = 4326)
+st_write(vstem_sf , "VSTeMclasses.geojson", driver = "GeoJSON") # export as geojson!
 
 
