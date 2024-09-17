@@ -53,7 +53,8 @@
         text-decoration: none;
       }
 
-      header { /* need to check in with boyd about aligning these elements in a less stupid way */
+      header {
+        /* need to check in with boyd about aligning these elements in a less stupid way */
         display: flex;
         color: #fff;
         width: 100%;
@@ -76,12 +77,13 @@
         justify-content: center;
       }
 
-      .btn-custom { /* i want button right aligned, centered with respect to the vertical axis */
+      .btn-custom {
+        /* i want button right aligned, centered with respect to the vertical axis */
         background-color: #00aae7;
         color: white;
         border: 0.5px solid white;
         margin-right: 15px;
-        margin-bottom: 23px; 
+        margin-bottom: 23px;
       }
 
       .btn-custom:hover {
@@ -104,7 +106,8 @@
         color: #fff;
       }
 
-      .tab-container { /* i want my tabs to be flush with bottom of header, padded right from map info button */
+      .tab-container {
+        /* i want my tabs to be flush with bottom of header, padded right from map info button */
         margin-bottom: 0;
         padding: 0;
       }
@@ -241,18 +244,30 @@ appears from horizontal start (left) of viewport. -->
         ></button>
       </div>
       <div class="offcanvas-body">
-        <h3 class="py-2">subtitle</h3>
+        <h3 class="py-2">Volunteer Water Monitoring in Connecticut</h3>
         <p>
-          A fan brush is a fantastic piece of equipment. Use it. Make friends
-          with it. We're not trying to teach you a thing to copy. We're just
-          here to teach you a technique, then let you loose into the world.
-          We'll put a happy little sky in here.
+          Connecticut is fortunate to be a water-rich state. We have thousands
+          of miles of rivers and streams, hundreds of lakes and ponds, and of
+          course, the magnificent Long Island Sound.
+          <br /><br />
+          CT DEEP encourages groups and individuals interested in helping to
+          conserve and protect our water resources to become volunteer water
+          monitors, also commonly referred to as 'citizen scientists' and
+          'community scientists.'
+          <br /><br />
+          The CT DEEP coordinates a statewide Volunteer Water Monitoring Program
+          that trains volunteers to collect water quality data using a variety
+          of DEEP certified methods. To learn more, or to view monitoring
+          results, click on the corresponding program tab.
         </p>
         <hr />
+        <h3 class="py-2">Questions?</h3>
         <ul class="list-unstyled">
-          <li>authored by <a href="#">NAME</a></li>
-          <li>Date of authored map</li>
-          <li>data source: <a href="#">data source</a></li>
+          <li>
+            Contact the
+            <a href="#">DEEP Volunteer Water Monitoring Program Coordinator </a>
+          </li>
+          <li>Data retrieved from the <a href="#">Water Quality Portal</a></li>
         </ul>
       </div>
     </div>
@@ -284,7 +299,7 @@ appears from horizontal start (left) of viewport. -->
 
       // initial Leaflet map options
       const options = {
-        center: [41.6, -72.6736],
+        center: [41.53, -72.6736],
         zoom: 9.5,
         zoomSnap: 0.1,
         zoomControl: false,
@@ -314,7 +329,37 @@ appears from horizontal start (left) of viewport. -->
         })
       );
 
-      // Example of dynamically adding content to page
+      // fetch data.. data points from WQP, polys from internal data, river lines from integrated report
+      fetch("data/ct_boundary.geojson")
+        // after it is returned...
+        .then(function (response) {
+          // Parse the JSON into a useable format, then return it
+          return response.json();
+        })
+        .then(function (data) {
+          // This is the JSON from our response
+          // console.log parameters first.
+          console.log(data);
+          // call draw map and send data as parameter
+          drawBoundary(data);
+          // Return a new fetch call and continue the chain
+        });
+
+      function drawBoundary(data) {
+        // create Leaflet data layer and add to map
+        const ctBoundary = L.geoJson(data, {
+          // boundary styling which will not change between maps
+          style: function (feature) {
+            return {
+              color: "#000",
+              weight: 2,
+              fillOpacity: 0,
+            };
+          },
+        }).addTo(map);
+      }
+
+      // footer content
       function setDate() {
         const date = new Date();
         const year = date.getFullYear();
