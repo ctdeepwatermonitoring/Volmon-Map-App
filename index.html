@@ -311,17 +311,14 @@ appears from horizontal start (left) of viewport. -->
       const map = L.map("map", options);
 
       // request a basemap tile layer and add to the map
-      var Stadia_StamenTonerLite = L.tileLayer(
-        "https://tiles.stadiamaps.com/tiles/stamen_toner_lite/{z}/{x}/{y}{r}.{ext}",
+      var Esri_WorldGrayCanvas = L.tileLayer(
+        "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}",
         {
-          minZoom: 0,
-          maxZoom: 20,
-          attribution:
-            '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://www.stamen.com/" target="_blank">Stamen Design</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-          ext: "png",
+          attribution: "Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ",
+          maxZoom: 16,
         }
       );
-      Stadia_StamenTonerLite.addTo(map);
+      Esri_WorldGrayCanvas.addTo(map); // stadia required an api key and i dont wanna deal with that right now
 
       // add zoom control
       map.addControl(
@@ -476,7 +473,7 @@ appears from horizontal start (left) of viewport. -->
 
       // tab functionality: VSTeM
       document.querySelector("#VSTeM").addEventListener("click", function () {
-        VSTeMsites.addTo(map); 
+        VSTeMsites.addTo(map);
 
         if (RBVsites) {
           map.removeLayer(RBVsites);
