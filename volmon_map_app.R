@@ -92,4 +92,8 @@ vstem_sf <- vstem %>%
   st_as_sf(coords = c("ActivityLocation.LongitudeMeasure", "ActivityLocation.LatitudeMeasure"), crs = 4326)
 st_write(vstem_sf , "VSTeMclasses.geojson", driver = "GeoJSON") # export as geojson!
 
+############ct lake watch data##########################################################
 
+ctlw <- read.csv("https://www.waterqualitydata.us/data/Station/search?project=CTLakeWatch&project=Connecticut%20Lake%20Watch&mimeType=csv&zip=no&providers=NWIS&providers=STORET")
+
+ctlw <- 
