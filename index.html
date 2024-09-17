@@ -330,7 +330,7 @@ appears from horizontal start (left) of viewport. -->
         })
       );
 
-      let RBVsites, VSTeMsites; // store layers
+      let RBVsites, VSTeMsites, CTLWsites; // store layers
 
       // fetch data.. data points from WQP, polys from internal data, river lines from integrated report
       // boundary first as it never changes
@@ -347,8 +347,8 @@ appears from horizontal start (left) of viewport. -->
           return response.json();
         })
         .then(function (data) {
-          RBVsites = drawRBV(data); 
-          setActiveTab('RBV'); // active by default
+          RBVsites = drawRBV(data);
+          setActiveTab("RBV"); // active by default
           RBVsites.addTo(map); // display by default
           // return a new fetch call and continue the chain
           return fetch("data/VSTeMclasses.geojson");
@@ -357,7 +357,15 @@ appears from horizontal start (left) of viewport. -->
           return response.json();
         })
         .then(function (data) {
-          VSTeMsites = drawVSTeM(data); 
+          VSTeMsites = drawVSTeM(data);
+          // return a new fetch call and continue the chain
+          return fetch("data/CTLWsites.geojson");
+        })
+        .then(function (response) {
+          return response.json();
+        })
+        .then(function (data) {
+          CTLWsites = drawCTLW(data);
         });
 
       // i am going to create functions for drawing each "type" of data, then figure out how to link interactivity to the tabs
@@ -419,7 +427,7 @@ appears from horizontal start (left) of viewport. -->
 
             return L.circleMarker(latlng, {
               // temp symbology to differentiate from rbv sites
-              radius: 3,
+              radius: 6,
               fillColor: color,
               color: color,
               weight: 2,
@@ -431,6 +439,24 @@ appears from horizontal start (left) of viewport. -->
         return VSTeMsites;
       }
 
+      // CTLW sites with static colors
+      function drawCTLW(data) {
+        const CTLWsites = L.geoJson(data, {
+          pointToLayer: function (feature, latlng) {
+            return L.circleMarker(latlng, {
+              // temp symbology to differentiate from rbv sites
+              radius: 6,
+              fillColor: "#23AE49",
+              color: "#23AE49",
+              weight: 2,
+              opacity: 1,
+              fillOpacity: 0.8,
+            });
+          },
+        });
+        return CTLWsites;
+      }
+
       // tab magic
 
       // tab functionality: RBV.. can i make this more efficient and do all at once?
@@ -440,18 +466,40 @@ appears from horizontal start (left) of viewport. -->
         if (VSTeMsites) {
           map.removeLayer(VSTeMsites);
         }
+        if (CTLWsites) {
+          map.removeLayer(CTLWsites);
+        }
+
         setActiveTab("RBV");
         // also need to make this work for each map legend
       });
 
       // tab functionality: VSTeM
       document.querySelector("#VSTeM").addEventListener("click", function () {
-        VSTeMsites.addTo(map); //
+        VSTeMsites.addTo(map); 
 
         if (RBVsites) {
           map.removeLayer(RBVsites);
         }
+        if (CTLWsites) {
+          map.removeLayer(CTLWsites);
+        }
+
         setActiveTab("VSTeM");
+      });
+
+      // tab functionality: CTLW
+      document.querySelector("#CTLW").addEventListener("click", function () {
+        CTLWsites.addTo(map); //
+
+        if (RBVsites) {
+          map.removeLayer(RBVsites);
+        }
+        if (VSTeMsites) {
+          map.removeLayer(VSTeMsites);
+        }
+
+        setActiveTab("CTLW");
       });
 
       function setActiveTab(tabID) {
