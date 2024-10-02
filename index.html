@@ -378,20 +378,23 @@ appears from horizontal start (left) of viewport. -->
           // either 4+ site or <4 site
           const maxScore = feature.properties.MaxScore;
           let color;
+          let radius;
           if (maxScore >= 4) {
             color = "#FDB515";
+            radius = 6;
           } else {
             color = "#0D2D6C";
+            radius = 3.5;
           }
 
           return L.circleMarker(latlng, {
             // i may make this a nicer symbol? but this looks not bad to start
-            radius: 6,
+            radius: radius,
             fillColor: color,
-            color: color,
-            weight: 2,
+            color: "black",
+            weight: 1.5,
             opacity: 1,
-            fillOpacity: 0.8,
+            fillOpacity: 1,
           });
         },
         onEachFeature: function (feature, layer) {
@@ -489,21 +492,24 @@ appears from horizontal start (left) of viewport. -->
           // either cold or not cold site (for now)
           const minScore = feature.properties.MinClassScore;
           let color;
+          let radius;
           if (minScore == 1) {
             // my coldwater site classification
             color = "#00AAE7";
+            radius = 6;
           } else {
-            color = "#FFED46";
+            color = "black";
+            radius = 3.5;
           }
 
           return L.circleMarker(latlng, {
             // temp symbology to differentiate from rbv sites
-            radius: 6,
+            radius: radius,
             fillColor: color,
-            color: color,
-            weight: 2,
+            color: "black",
+            weight: 1.5,
             opacity: 1,
-            fillOpacity: 0.8,
+            fillOpacity: 1,
           });
         },
         onEachFeature: function (feature, layer) {
@@ -540,7 +546,7 @@ appears from horizontal start (left) of viewport. -->
               color: "#68CEF2",
               weight: 0,
               opacity: 0,
-              fillOpacity: 0.8,
+              fillOpacity: 0.3,
             }
           );
         },
@@ -561,10 +567,10 @@ appears from horizontal start (left) of viewport. -->
             // temp symbology to differentiate from rbv sites
             radius: 6,
             fillColor: "#23AE49",
-            color: "#23AE49",
+            color: "black",
             weight: 2,
             opacity: 1,
-            fillOpacity: 0.8,
+            fillOpacity: 1,
           });
         },
         onEachFeature: function (feature, layer) {
@@ -585,7 +591,7 @@ appears from horizontal start (left) of viewport. -->
           layer.on('mouseout', function () {
             this.setStyle({
               fillColor: "#23AE49", // original color
-              color: "#23AE49"
+              color: "black"
             });
           });
         },
