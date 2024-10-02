@@ -4,7 +4,8 @@ library(lubridate)
 library(tidyr)
 library(mapview)
 
-setwd("C:/Users/edwardsch/Documents/GitHub/Volmon-Map-App/data")
+setwd("C:/Users/edwardsch/Documents/GitHub/Volmon-Map-App/data") #work
+setwd("C:/Users/flizo/Documents/nmp/map673/Volmon-Map-App/data") #personal
 
 #boundary portion
 
@@ -67,6 +68,11 @@ st_write(RBV_sf, "RBVmetrics.geojson", driver = "GeoJSON") # export as geojson!
 #rbv high priority watersheds layer
 rbv_watersheds <- read_sf(dsn = ".", layer = "NHDCatchments_ModMMI_75andHigher") # this is whats on the current arcgis map
 st_write(rbv_watersheds, "rbv_watersheds.geojson", driver = "GeoJSON") # export as geojson!
+
+#assessed river/stream layer
+assessed_river <- read_sf(dsn = ".", layer = "CT_305b_Assessed_River_2022") # can now delete shapefile
+mapview(assessed_river)
+st_write(assessed_river, "assessed_river.geojson", driver = "GeoJSON") # export as geojson!
 
 ############vstem data##########################################################
 
