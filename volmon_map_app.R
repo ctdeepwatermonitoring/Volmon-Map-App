@@ -29,39 +29,88 @@ colnames(RBV)
 RBV_formatted <- RBV[c("MonitoringLocationIdentifier.x", "MonitoringLocationName", "LatitudeMeasure", 
              "LongitudeMeasure", "MetricValueMeasure.MetricScoreNumeric", "Year")]
 
-RBV_pre_pivot <- RBV_formatted %>%
-  group_by(MonitoringLocationIdentifier.x, Year) %>%
-  summarize(MaxMetricScore = max(MetricValueMeasure.MetricScoreNumeric, na.rm = TRUE), .groups = 'drop') # drop non unique combos
+RBV_location <- RBV[c("MonitoringLocationIdentifier.x", "MonitoringLocationName", "LatitudeMeasure", 
+                      "LongitudeMeasure")]
+RBV_location <- RBV_location[!duplicated(RBV_location[c("MonitoringLocationIdentifier.x")]), ]
 
-RBV_pre_pivot <- RBV_pre_pivot[c("MonitoringLocationIdentifier.x", "Year", "MaxMetricScore")]
 
-RBV_pivot <- RBV_pre_pivot %>%
-  pivot_wider(
-    names_from = Year,    
-    names_prefix = "Year_", #to make identifying them easier
-    values_from = MaxMetricScore)
+# max score and year
+RBV_max <- RBV_formatted %>%
+  group_by(MonitoringLocationIdentifier.x) %>%
+  summarize(MaxScore = max(MetricValueMeasure.MetricScoreNumeric, na.rm = TRUE), .groups = 'drop') %>%
+  inner_join(RBV_formatted, by = c("MonitoringLocationIdentifier.x", "MaxScore" = "MetricValueMeasure.MetricScoreNumeric")) %>%
+  select(MonitoringLocationIdentifier.x, Year, MaxScore) %>%
+  arrange(MonitoringLocationIdentifier.x, Year)
 
-RBV_pivot <- RBV_pivot %>%
-  rowwise() %>%
-  mutate(MaxScore = max(c_across(starts_with("Year_")), na.rm = TRUE)) %>%
-  ungroup() # max score used for symbology
+RBV_max <- RBV_max[!duplicated(RBV_max[c("MonitoringLocationIdentifier.x", "MaxScore")]), ] # same max score across multiple years
 
-colnames(RBV_pivot)
+# most recent score and year
+RBV_recent <- RBV_formatted %>%
+  group_by(MonitoringLocationIdentifier.x) %>%
+  summarize(RecentYear = max(Year, na.rm = TRUE), .groups = 'drop') %>%
+  inner_join(RBV_formatted, by = c("MonitoringLocationIdentifier.x", "RecentYear" = "Year")) %>%
+  select(MonitoringLocationIdentifier.x, RecentYear, MetricValueMeasure.MetricScoreNumeric) %>%
+  rename(RecentScore = MetricValueMeasure.MetricScoreNumeric) %>%
+  arrange(MonitoringLocationIdentifier.x, RecentYear)
 
-colnames(RBV_pivot)[colnames(RBV_pivot) == 'MonitoringLocationIdentifier.x'] <- 'MonitoringLocationIdentifier'
+RBV_recent <- RBV_recent[!duplicated(RBV_recent[c("MonitoringLocationIdentifier.x", "RecentYear")]), ] #  same site in same year
 
-RBV_pivot <- merge(RBV_pivot, RBVstations, by = "MonitoringLocationIdentifier")
+#merging for final df
+RBV_merged <- merge(RBV_max, RBV_recent, by = "MonitoringLocationIdentifier.x")
+RBV_merged <- merge(RBV_merged, RBV_location, by = "MonitoringLocationIdentifier.x")
 
-RBV_pivot <- RBV_pivot[c("MonitoringLocationIdentifier", "MonitoringLocationName", "LatitudeMeasure", "LongitudeMeasure", 
-                         "Year_1999", "Year_2000",
-                         "Year_2001", "Year_2002", "Year_2003", "Year_2004",
-                         "Year_2005", "Year_2006", "Year_2007", "Year_2008", 
-                         "Year_2009", "Year_2010", "Year_2011", "Year_2012",
-                         "Year_2013", "Year_2014", "Year_2015", "Year_2016",
-                         "Year_2017", "Year_2018", "Year_2019", "Year_2020",
-                         "Year_2021", "Year_2022", "Year_2023", "MaxScore")]
+#renaming and formatting
+colnames(RBV_merged)[colnames(RBV_merged) == 'MonitoringLocationIdentifier.x'] <- 'MonitoringLocationIdentifier'
+colnames(RBV_merged)[colnames(RBV_merged) == 'Year'] <- 'MaxScoreYear'
+RBV_merged <- RBV_merged[c("MonitoringLocationIdentifier", "MonitoringLocationName", "LatitudeMeasure", 
+                       "LongitudeMeasure", "MaxScore", "MaxScoreYear", "RecentScore", "RecentYear")]
 
-RBV_sf <- RBV_pivot %>%
+
+
+# RBV_recent <- RBV_formatted %>%
+#   group_by(MonitoringLocationIdentifier.x) %>%
+#   filter(Year == max(Year)) %>%
+#   summarize(RecentScore = MetricValueMeasure.MetricScoreNumeric,
+#             RecentScoreYear = Year,
+#             .groups = 'drop')
+# 
+# RBV_pre_pivot <- RBV_formatted %>%
+#   group_by(MonitoringLocationIdentifier.x, Year) %>%
+#   summarize(MaxMetricScore = max(MetricValueMeasure.MetricScoreNumeric, na.rm = TRUE), .groups = 'drop') # drop non unique combos
+# 
+# RBV_pre_pivot <- RBV_pre_pivot[c("MonitoringLocationIdentifier.x", "Year", "MaxMetricScore")]
+# 
+# RBV_pivot <- RBV_pre_pivot %>%
+#   pivot_wider(
+#     names_from = Year,    
+#     names_prefix = "Year_", #to make identifying them easier
+#     values_from = MaxMetricScore)
+# 
+# RBV_pivot <- RBV_pivot %>%
+#   rowwise() %>%
+#   mutate(
+#     MaxScore = max(c_across(starts_with("Year_")), na.rm = TRUE),
+#     MaxScoreYear = names(.)[which.max(c_across(starts_with("Year_")))]
+#   ) %>%
+#   ungroup() # max score used for symbology
+# 
+# 
+# colnames(RBV_pivot)
+# 
+# colnames(RBV_pivot)[colnames(RBV_pivot) == 'MonitoringLocationIdentifier.x'] <- 'MonitoringLocationIdentifier'
+# 
+# RBV_pivot <- merge(RBV_pivot, RBVstations, by = "MonitoringLocationIdentifier")
+# 
+# RBV_pivot <- RBV_pivot[c("MonitoringLocationIdentifier", "MonitoringLocationName", "LatitudeMeasure", "LongitudeMeasure", 
+#                          "Year_1999", "Year_2000",
+#                          "Year_2001", "Year_2002", "Year_2003", "Year_2004",
+#                          "Year_2005", "Year_2006", "Year_2007", "Year_2008", 
+#                          "Year_2009", "Year_2010", "Year_2011", "Year_2012",
+#                          "Year_2013", "Year_2014", "Year_2015", "Year_2016",
+#                          "Year_2017", "Year_2018", "Year_2019", "Year_2020",
+                         # "Year_2021", "Year_2022", "Year_2023", "MaxScore")]
+
+RBV_sf <- RBV_merged %>%
   st_as_sf(coords = c("LongitudeMeasure", "LatitudeMeasure"), crs = 4326)
 st_write(RBV_sf, "RBVmetrics.geojson", driver = "GeoJSON") # export as geojson!
 

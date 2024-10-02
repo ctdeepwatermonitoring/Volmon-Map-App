@@ -296,7 +296,7 @@ appears from horizontal start (left) of viewport. -->
       })
     );
 
-    let RBVsites, streams, RBVWS, VSTeMsites, CWWS, CTLWsites; // store layers
+    let originalStreamData;
 
     // fetch data.. data points from WQP, polys from internal data, river lines from integrated report
     // boundary first as it never changes
@@ -305,6 +305,7 @@ appears from horizontal start (left) of viewport. -->
         return response.json();
       })
       .then(function (data) {
+
         setActiveTab("RBV"); // active by default
         drawBoundary(data); // function for each type of data
         // return a new fetch call and continue the chain
@@ -314,7 +315,8 @@ appears from horizontal start (left) of viewport. -->
         return response.json();
       })
       .then(function (data) {
-        streams = drawStreams(data);
+        originalStreamData = data; // original data for future layers
+        streams = drawStreams(originalStreamData); // initial styling
         streams.addTo(map);
         // return a new fetch call and continue the chain
         return fetch("data/rbv_watersheds.geojson");
@@ -427,17 +429,19 @@ appears from horizontal start (left) of viewport. -->
       return RBVWS; // return the RBVWS layer
     }
 
-    function drawStreams(data, activeTab) {
+    function drawStreams(data) {
       const streams = L.geoJson(data, {
         style: function (feature) {
           let color;
           // style based on active tab and layer info (informational vs decision making)
-            const assessment = feature.properties.CT2022_A_1; // ALUS assessment determination
-            if (assessment === "Fully Supporting") {
-              color = "#00AAE7"; // light DEEP blue for full support
-            } else if (assessment === "Not Supporting") {
-              color = "#FF0000"; // red for not supporting
-            }
+          const assessment = feature.properties.CT2022_A_1; // ALUS assessment determination
+          if (assessment === "Fully Supporting") {
+            color = "#00AAE7"; // light blue for full support
+          } else if (assessment === "Not Supporting") {
+            color = "#FF0000"; // red for not supporting
+          } else {
+            color = "#595959"; // grey for non-assessed lines
+          }
           return {
             color: color,
             weight: 2,
@@ -451,6 +455,14 @@ appears from horizontal start (left) of viewport. -->
         },
       });
       return streams;
+    }
+
+    function updateStreams(streams) {
+      streams.setStyle({
+        color: "#0D2D6C", // dark blue for VSTeM
+        weight: 2,
+        opacity: 1,
+      });
     }
 
     // VSTeM sites with color coding
@@ -526,7 +538,9 @@ appears from horizontal start (left) of viewport. -->
 
     // tab functionality: RBV.. can i make this more efficient and do all at once?
     document.querySelector("#RBV").addEventListener("click", function () {
-      RBVsites.addTo(map); // I think I can very easily add/remove a bunch of layers here
+      RBVsites.addTo(map); 
+      map.removeLayer(streams);
+      streams = drawStreams(originalStreamData); // redraw so it doesnt stay dark blue .. this code seems very inefficient
       streams.addTo(map);
       RBVWS.addTo(map);
 
@@ -548,6 +562,7 @@ appears from horizontal start (left) of viewport. -->
     document.querySelector("#VSTeM").addEventListener("click", function () {
       VSTeMsites.addTo(map);
       streams.addTo(map);
+      updateStreams(streams);
       CWWS.addTo(map);
 
       if (RBVsites) {
