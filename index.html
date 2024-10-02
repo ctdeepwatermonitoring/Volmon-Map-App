@@ -513,6 +513,16 @@ appears from horizontal start (left) of viewport. -->
             fillOpacity: 0.8,
           });
         },
+        onEachFeature: function (feature, layer) {
+          // tooltip params
+          const siteName = feature.properties.MonitoringLocationName;
+          const siteID = feature.properties.MonitoringLocationIdentifier;
+          const classification = feature.properties.MinClassScore;
+
+          // info for decision-making (site selection)
+          layer.bindTooltip(`<b>${siteName}:</b> ${siteID} <br>
+          <b>Classification:</b> ${classification}`, {});
+        },
       });
       return VSTeMsites;
     }
@@ -530,6 +540,11 @@ appears from horizontal start (left) of viewport. -->
               fillOpacity: 0.8,
             }
           );
+        },
+        onEachFeature: function (feature, layer) {
+          layer.on("add", function () {
+            layer.bringToBack();
+          });
         },
       });
       return CWWS; // return the CWWS layer
