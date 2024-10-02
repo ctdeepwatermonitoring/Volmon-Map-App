@@ -61,6 +61,7 @@ RBV_merged <- merge(RBV_merged, RBV_location, by = "MonitoringLocationIdentifier
 
 #renaming and formatting
 colnames(RBV_merged)[colnames(RBV_merged) == 'MonitoringLocationIdentifier.x'] <- 'MonitoringLocationIdentifier'
+RBV_merged$MonitoringLocationIdentifier <- gsub("CTVOLMON-", "", RBV_merged$MonitoringLocationIdentifier) #wqp adds that in
 colnames(RBV_merged)[colnames(RBV_merged) == 'Year'] <- 'MaxScoreYear'
 RBV_merged <- RBV_merged[c("MonitoringLocationIdentifier", "MonitoringLocationName", "LatitudeMeasure", 
                        "LongitudeMeasure", "MaxScore", "MaxScoreYear", "RecentScore", "RecentYear")]
