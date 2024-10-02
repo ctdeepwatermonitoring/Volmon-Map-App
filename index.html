@@ -201,6 +201,13 @@
     <div class="p-0">
       <!-- Map container with height dynamically calc'd in JS. -->
       <div id="map"></div>
+
+
+      <!-- legends will go here --> 
+      <div id="legendRBV" class="legend"></div>
+      <div id="legendVSTeM" class="legend"></div>
+      <div id="legendCTLW" class="legend"></div>
+      
     </div>
   </section>
 
@@ -292,7 +299,7 @@ appears from horizontal start (left) of viewport. -->
     // add zoom control
     map.addControl(
       L.control.zoom({
-        position: "topright",
+        position: "bottomright",
       })
     );
 
@@ -517,7 +524,17 @@ appears from horizontal start (left) of viewport. -->
           // tooltip params
           const siteName = feature.properties.MonitoringLocationName;
           const siteID = feature.properties.MonitoringLocationIdentifier;
-          const classification = feature.properties.MinClassScore;
+          const classScore = feature.properties.MinClassScore;
+
+          // convert this to text (text names were normalized in R code)
+          let classification;
+          if (classScore === 1) {
+            classification = "Cold";
+          } else if (classScore === 2) {
+            classification = "Cool";
+          } else if (classScore === 3) {
+            classification = "Warm";
+          } 
 
           // info for decision-making (site selection)
           layer.bindTooltip(`<b>${siteName}:</b> ${siteID} <br>
@@ -564,6 +581,14 @@ appears from horizontal start (left) of viewport. -->
             fillOpacity: 0.8,
           });
         },
+        onEachFeature: function (feature, layer) {
+          // tooltip params
+          const siteName = feature.properties.MonitoringLocationName;
+
+          // info for decision-making (site selection)
+          layer.bindPopup(`<b>${siteName}</b> <br>
+          Report <a href = "">link</a>`, {}); // popup so you can click on link, temp placeholder
+        },
       });
       return CTLWsites;
     }
@@ -578,6 +603,9 @@ appears from horizontal start (left) of viewport. -->
 
       if (VSTeMsites) {
         map.removeLayer(VSTeMsites);
+      }
+      if (blueStreams) {
+        map.removeLayer(blueStreams);
       }
       if (CWWS) {
         map.removeLayer(CWWS);
@@ -627,6 +655,9 @@ appears from horizontal start (left) of viewport. -->
       }
       if (VSTeMsites) {
         map.removeLayer(VSTeMsites);
+      }
+      if (blueStreams) {
+        map.removeLayer(blueStreams);
       }
       if (CWWS) {
         map.removeLayer(CWWS);
