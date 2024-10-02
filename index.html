@@ -296,7 +296,6 @@ appears from horizontal start (left) of viewport. -->
       })
     );
 
-    let originalStreamData;
 
     // fetch data.. data points from WQP, polys from internal data, river lines from integrated report
     // boundary first as it never changes
@@ -315,8 +314,8 @@ appears from horizontal start (left) of viewport. -->
         return response.json();
       })
       .then(function (data) {
-        originalStreamData = data; // original data for future layers
-        streams = drawStreams(originalStreamData); // initial styling
+        streams = drawStreams(data); // initial styling
+        blueStreams = drawBlueStreams(data);
         streams.addTo(map);
         // return a new fetch call and continue the chain
         return fetch("data/rbv_watersheds.geojson");
@@ -404,18 +403,17 @@ appears from horizontal start (left) of viewport. -->
         },
         onEachFeature: function (feature, layer) {
           // tooltip params
-          const siteName = feature.properties.MonitoringLocationName; 
+          const siteName = feature.properties.MonitoringLocationName;
           const siteID = feature.properties.MonitoringLocationIdentifier;
-          const maxScore = feature.properties.MaxScore; 
+          const maxScore = feature.properties.MaxScore;
           const maxScoreYear = feature.properties.MaxScoreYear;
-          const recentScore = feature.properties.RecentScore; 
+          const recentScore = feature.properties.RecentScore;
           const recentScoreYear = feature.properties.RecentYear;
 
           // info for decision-making (site selection)
           layer.bindTooltip(`<b>${siteName}:</b> ${siteID} <br>
           <b>Max result:</b> ${maxScore} MW in ${maxScoreYear}<br>
-          <b>Most recent result:</b> ${recentScore} MW in ${recentScoreYear}`, {
-          });
+          <b>Most recent result:</b> ${recentScore} MW in ${recentScoreYear}`, {});
         },
       });
       return RBVsites; // return the RBVsites layer
@@ -434,11 +432,6 @@ appears from horizontal start (left) of viewport. -->
               fillOpacity: 0.8,
             }
           );
-        },
-        onEachFeature: function (feature, layer) {
-          layer.on("add", function () {
-            layer.bringToBack();
-          });
         },
       });
       return RBVWS; // return the RBVWS layer
@@ -464,30 +457,36 @@ appears from horizontal start (left) of viewport. -->
           };
         },
         onEachFeature: function (feature, layer) {
-          layer.on("add", function () {
-            layer.bringToBack();
-          });
-        },
-        onEachFeature: function (feature, layer) {
           // tooltip params
-          const segmentName = feature.properties.ASSESSME_1; 
+          const segmentName = feature.properties.ASSESSME_1;
           const assessment = feature.properties.CT2022_A_1;
 
           // info for decision-making (site selection)
           layer.bindTooltip(`<b>${segmentName}:</b> <br>
-           ${assessment} ALUS`, {
-          });
+           ${assessment} ALUS`, {});
         },
       });
       return streams;
     }
 
-    function updateStreams(streams) {
-      streams.setStyle({
-        color: "#0D2D6C", // dark blue for VSTeM
-        weight: 2,
-        opacity: 1,
+    function drawBlueStreams(data) {
+      const blueStreams = L.geoJson(data, {
+        style: function (feature) {
+          return {
+            color: '#0D2D6c',
+            weight: 2,
+            opacity: 1,
+          };
+        },
+        onEachFeature: function (feature, layer) {
+          // tooltip params
+          const segmentName = feature.properties.ASSESSME_1;
+
+          // info for decision-making (site selection)
+          layer.bindTooltip(`<b>${segmentName}</b>`, {});
+        },
       });
+      return blueStreams;
     }
 
     // VSTeM sites with color coding
@@ -532,11 +531,6 @@ appears from horizontal start (left) of viewport. -->
             }
           );
         },
-        onEachFeature: function (feature, layer) {
-          layer.on("add", function () {
-            layer.bringToBack();
-          });
-        },
       });
       return CWWS; // return the CWWS layer
     }
@@ -563,12 +557,9 @@ appears from horizontal start (left) of viewport. -->
 
     // tab functionality: RBV.. can i make this more efficient and do all at once?
     document.querySelector("#RBV").addEventListener("click", function () {
-      RBVsites.addTo(map);
-      map.removeLayer(streams);
-      streams = drawStreams(
-      originalStreamData); // redraw so it doesnt stay dark blue .. this code seems very inefficient
-      streams.addTo(map);
       RBVWS.addTo(map);
+      streams.addTo(map);
+      RBVsites.addTo(map);
 
       if (VSTeMsites) {
         map.removeLayer(VSTeMsites);
@@ -586,16 +577,18 @@ appears from horizontal start (left) of viewport. -->
 
     // tab functionality: VSTeM
     document.querySelector("#VSTeM").addEventListener("click", function () {
-      VSTeMsites.addTo(map);
-      streams.addTo(map);
-      updateStreams(streams);
       CWWS.addTo(map);
+      blueStreams.addTo(map);
+      VSTeMsites.addTo(map);
 
       if (RBVsites) {
         map.removeLayer(RBVsites);
       }
       if (RBVWS) {
         map.removeLayer(RBVWS);
+      }
+      if (streams) {
+        map.removeLayer(streams);
       }
       if (CTLWsites) {
         map.removeLayer(CTLWsites);
