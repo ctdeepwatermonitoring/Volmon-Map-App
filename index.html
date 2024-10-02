@@ -427,12 +427,20 @@ appears from horizontal start (left) of viewport. -->
       return RBVWS; // return the RBVWS layer
     }
 
-    function drawStreams(data) {
+    function drawStreams(data, activeTab) {
       const streams = L.geoJson(data, {
         style: function (feature) {
+          let color;
+          // style based on active tab and layer info (informational vs decision making)
+            const assessment = feature.properties.CT2022_A_1; // ALUS assessment determination
+            if (assessment === "Fully Supporting") {
+              color = "#00AAE7"; // light DEEP blue for full support
+            } else if (assessment === "Not Supporting") {
+              color = "#FF0000"; // red for not supporting
+            }
           return {
-            color: "#00AAE7",
-            weight: 1,
+            color: color,
+            weight: 2,
             opacity: 1,
           };
         },
