@@ -296,7 +296,7 @@ appears from horizontal start (left) of viewport. -->
       })
     );
 
-    let RBVsites, RBVWS, VSTeMsites, CWWS, CTLWsites; // store layers
+    let RBVsites, streams, RBVWS, VSTeMsites, CWWS, CTLWsites; // store layers
 
     // fetch data.. data points from WQP, polys from internal data, river lines from integrated report
     // boundary first as it never changes
@@ -305,6 +305,7 @@ appears from horizontal start (left) of viewport. -->
         return response.json();
       })
       .then(function (data) {
+        setActiveTab("RBV"); // active by default
         drawBoundary(data); // function for each type of data
         // return a new fetch call and continue the chain
         return fetch("data/assessed_river.geojson");
@@ -313,7 +314,6 @@ appears from horizontal start (left) of viewport. -->
         return response.json();
       })
       .then(function (data) {
-        setActiveTab("RBV"); // active by default
         streams = drawStreams(data);
         streams.addTo(map);
         // return a new fetch call and continue the chain
@@ -323,18 +323,8 @@ appears from horizontal start (left) of viewport. -->
         return response.json();
       })
       .then(function (data) {
-
         RBVWS = drawRBVWS(data);
         RBVWS.addTo(map); // display by default
-        // return a new fetch call and continue the chain
-        return fetch("data/assessed_river.geojson");
-      })
-      .then(function (response) {
-        return response.json();
-      })
-      .then(function (data) {
-        streams = drawStreams(data);
-        streams.addTo(map);
         // return a new fetch call and continue the chain
         return fetch("data/RBVmetrics.geojson");
       })
@@ -497,6 +487,11 @@ appears from horizontal start (left) of viewport. -->
             }
           );
         },
+        onEachFeature: function (feature, layer) {
+          layer.on("add", function () {
+            layer.bringToBack();
+          });
+        },
       });
       return CWWS; // return the CWWS layer
     }
@@ -524,6 +519,7 @@ appears from horizontal start (left) of viewport. -->
     // tab functionality: RBV.. can i make this more efficient and do all at once?
     document.querySelector("#RBV").addEventListener("click", function () {
       RBVsites.addTo(map); // I think I can very easily add/remove a bunch of layers here
+      streams.addTo(map);
       RBVWS.addTo(map);
 
       if (VSTeMsites) {
@@ -543,6 +539,7 @@ appears from horizontal start (left) of viewport. -->
     // tab functionality: VSTeM
     document.querySelector("#VSTeM").addEventListener("click", function () {
       VSTeMsites.addTo(map);
+      streams.addTo(map);
       CWWS.addTo(map);
 
       if (RBVsites) {
@@ -567,6 +564,9 @@ appears from horizontal start (left) of viewport. -->
       }
       if (RBVWS) {
         map.removeLayer(RBVWS);
+      }
+      if (streams) {
+        map.removeLayer(streams);
       }
       if (VSTeMsites) {
         map.removeLayer(VSTeMsites);
