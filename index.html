@@ -203,11 +203,11 @@
       <div id="map"></div>
 
 
-      <!-- legends will go here --> 
+      <!-- legends will go here -->
       <div id="legendRBV" class="legend"></div>
       <div id="legendVSTeM" class="legend"></div>
       <div id="legendCTLW" class="legend"></div>
-      
+
     </div>
   </section>
 
@@ -534,7 +534,7 @@ appears from horizontal start (left) of viewport. -->
             classification = "Cool";
           } else if (classScore === 3) {
             classification = "Warm";
-          } 
+          }
 
           // info for decision-making (site selection)
           layer.bindTooltip(`<b>${siteName}:</b> ${siteID} <br>
@@ -587,11 +587,15 @@ appears from horizontal start (left) of viewport. -->
 
           // info for decision-making (site selection)
           layer.bindPopup(`<b>${siteName}</b> <br>
-          Report <a href = "">link</a>`, {}); // popup so you can click on link, temp placeholder
+          <a href = "data/reports/${siteName}.html">Report  link</a>`, {}); // does this work?
         },
       });
       return CTLWsites;
     }
+
+
+    // creating legends
+
 
     // tab magic
 
