@@ -27,6 +27,11 @@
       font-size: 250%;
     }
 
+    h2 {
+      font-weight: 500;
+      font-size: 150%;
+    }
+
     p {
       line-height: 1.7rem;
     }
@@ -108,7 +113,7 @@
       /* tabs will control layer visibility, illusion of being separate maps */
       background-color: #fff;
       color: #0d2d6c;
-      border: 2px solid #0d2d6c;
+      border: 3px solid #0d2d6c;
       padding: 0.5rem 1rem;
       cursor: pointer;
       font-size: 1rem;
@@ -121,7 +126,7 @@
     }
 
     .tab.active {
-      border: 2px solid #fff;
+      border: 3px solid #fff;
       /* illusion of it being flush with the map like file tabs when active */
     }
 
@@ -132,31 +137,14 @@
       /*keeps it behind headers/footers*/
     }
 
-    .legend {
-      font-size: 1rem;
-      border-radius: 5px;
-      max-width: 200px;
+    #legend {
       font-family: "Open Sans", sans-serif;
-      background: rgba(100, 100, 100, 0.9);
-      color: rgba(244, 244, 244, 0.8);
-      box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-    }
-
-    .legend h3 {
-      font-size: 1.1em;
-      font-weight: normal;
-      color: #ddd;
-      margin: 0 0 10px 0;
-    }
-
-    .legend span {
-      width: 20px;
-      height: 20px;
-      margin: 0 10px 4px 0;
-    }
-
-    .legend label {
       font-size: 0.9rem;
+      color: #0d2d6c;
+      background-color: white;
+      z-index: 1000;
+      top: 100px;
+      right: 10px;
     }
 
     /* Small devices (landscape phones, 576px and up) */
@@ -204,9 +192,7 @@
 
 
       <!-- legends will go here -->
-      <div id="legendRBV" class="legend"></div>
-      <div id="legendVSTeM" class="legend"></div>
-      <div id="legendCTLW" class="legend"></div>
+      <div id="legend" class="position-absolute shadow-sm p-2 bg-light square-2"></div>
 
     </div>
   </section>
@@ -311,8 +297,8 @@ appears from horizontal start (left) of viewport. -->
         return response.json();
       })
       .then(function (data) {
-
         setActiveTab("RBV"); // active by default
+        drawRBVLegend(); // drawn by default
         drawBoundary(data); // function for each type of data
         // return a new fetch call and continue the chain
         return fetch("data/assessed_river.geojson");
@@ -585,9 +571,23 @@ appears from horizontal start (left) of viewport. -->
           // tooltip params
           const siteName = feature.properties.MonitoringLocationName;
 
-          // info for decision-making (site selection)
-          layer.bindPopup(`<b>${siteName}</b> <br>
-          <a href = "data/reports/${siteName}.html">Report  link</a>`, {}); // does this work?
+          // these are popups so you can touch the link
+          layer.bindPopup(
+          `<b>${siteName}</b> <br>
+          <a href = "data/reports/${siteName}.html">View interactive report</a>`, {}); // i evidently need to update my rmd code with some new 2024 sites
+          layer.on('mouseover', function () {
+            this.setStyle({
+              fillColor: "#9ECf7C", // trying to indicate something happens when you click on the point
+              color: "#9ECf7C"
+            });
+          });
+
+          layer.on('mouseout', function () {
+            this.setStyle({
+              fillColor: "#23AE49", // original color
+              color: "#23AE49"
+            });
+          });
         },
       });
       return CTLWsites;
@@ -595,7 +595,28 @@ appears from horizontal start (left) of viewport. -->
 
 
     // creating legends
+    // just using simple bullet points with colors for now until i make the styling actually look nice :,)
 
+    function drawRBVLegend() {
+      const legendDiv = document.getElementById("legend");
+      legendDiv.innerHTML = `<h2>RBV Sites</h2>
+    <p><span style="color:#FDB515; font-size: 24px;">&#9679;</span> 4 or more most wanted</p> 
+    <p><span style="color:#0D2D6C; font-size: 24px;">&#9679;</span> 3 or less most wanted</p>
+    <p><span style="color:#9ECF7C; font-size: 24px;">&#9679;</span> High priority watersheds</p>`;
+    }
+
+    function drawVSTeMLegend() {
+      const legendDiv = document.getElementById("legend");
+      legendDiv.innerHTML = `<h2>VSTeM Sites</h2>
+    <p><span style="color:#00AAE7; font-size: 24px;">&#9679;</span> Coldwater habitat</p>
+    <p><span style="color:#FFED46; font-size: 24px;">&#9679;</span> Other sites</p>`;
+    }
+
+    function drawCTLWLegend() {
+      const legendDiv = document.getElementById("legend");
+      legendDiv.innerHTML = `<h2>CT Lake Watch Sites</h2>
+    <p><span style="color:#23AE49; font-size: 24px;">&#9679;</span> Monitored lake</p>`;
+    }
 
     // tab magic
 
@@ -604,6 +625,7 @@ appears from horizontal start (left) of viewport. -->
       RBVWS.addTo(map);
       streams.addTo(map);
       RBVsites.addTo(map);
+      drawRBVLegend();
 
       if (VSTeMsites) {
         map.removeLayer(VSTeMsites);
@@ -627,6 +649,7 @@ appears from horizontal start (left) of viewport. -->
       CWWS.addTo(map);
       blueStreams.addTo(map);
       VSTeMsites.addTo(map);
+      drawVSTeMLegend();
 
       if (RBVsites) {
         map.removeLayer(RBVsites);
@@ -646,7 +669,8 @@ appears from horizontal start (left) of viewport. -->
 
     // tab functionality: CTLW
     document.querySelector("#CTLW").addEventListener("click", function () {
-      CTLWsites.addTo(map); //
+      CTLWsites.addTo(map);
+      drawCTLWLegend();
 
       if (RBVsites) {
         map.removeLayer(RBVsites);

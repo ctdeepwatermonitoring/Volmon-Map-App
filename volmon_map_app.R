@@ -150,6 +150,8 @@ vstem_sites <- vstem[!duplicated(vstem[c("MonitoringLocationIdentifier")]), ]
 vstem <- merge(vstem_sites, vstem_classes, by = "MonitoringLocationIdentifier")
 vstem <- vstem[c("MonitoringLocationIdentifier", "MonitoringLocationName", 
                  "ActivityLocation.LatitudeMeasure",  "ActivityLocation.LongitudeMeasure", "MinClassScore")]
+vstem$MonitoringLocationIdentifier <- gsub("CTVOLMON-", "", vstem$MonitoringLocationIdentifier) #wqp adds that in
+
 vstem_sf <- vstem %>%
   st_as_sf(coords = c("ActivityLocation.LongitudeMeasure", "ActivityLocation.LatitudeMeasure"), crs = 4326)
 st_write(vstem_sf , "VSTeMclasses.geojson", driver = "GeoJSON") # export as geojson!
