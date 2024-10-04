@@ -406,10 +406,12 @@ appears from horizontal start (left) of viewport. -->
           const recentScore = feature.properties.RecentScore;
           const recentScoreYear = feature.properties.RecentYear;
 
-          // info for decision-making (site selection)
-          layer.bindTooltip(`<b>${siteName}:</b> ${siteID} <br>
+          // info for decision-making (site selection).. now a popup so you can click the WQP link
+          layer.bindPopup(`<b>${siteName}:</b> ${siteID} <br> 
           <b>Max result:</b> ${maxScore} MW in ${maxScoreYear}<br>
-          <b>Most recent result:</b> ${recentScore} MW in ${recentScoreYear}`, {});
+          <b>Most recent result:</b> ${recentScore} MW in ${recentScoreYear} <br>
+          <a href = "https://www.waterqualitydata.us/data/ActivityMetric/search?siteid=CTVOLMON-${siteID}&project=CT-VOLMON-RBV&mimeType=csv&zip=no&providers=NWIS&providers=STORET">
+            Download historical data</a>`, {});
         },
       });
       return RBVsites; // return the RBVsites layer
