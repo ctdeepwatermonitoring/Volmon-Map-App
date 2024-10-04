@@ -208,27 +208,69 @@ appears from horizontal start (left) of viewport. -->
   <div class="offcanvas offcanvas-start bg-dark text-white" tabindex="-1" id="offcanvasExample"
     aria-labelledby="offcanvasExampleLabel">
     <div class="offcanvas-header">
-      <h5 class="offcanvas-title" id="offcanvasExampleLabel">Map Info</h5>
+
       <!-- Button to close off-canvas element. -->
       <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
     <div class="offcanvas-body">
       <h3 class="py-2">Volunteer Water Monitoring in Connecticut</h3>
       <p>
-        Connecticut is fortunate to be a water-rich state. We have thousands
-        of miles of rivers and streams, hundreds of lakes and ponds, and of
-        course, the magnificent Long Island Sound.
-        <br /><br />
-        CT DEEP encourages groups and individuals interested in helping to
-        conserve and protect our water resources to become volunteer water
-        monitors, also commonly referred to as 'citizen scientists' and
-        'community scientists.'
-        <br /><br />
-        The CT DEEP coordinates a statewide Volunteer Water Monitoring Program
+        CT DEEP coordinates a statewide <a
+          href="https://portal.ct.gov/deep/water/inland-water-monitoring/volunteer-water-monitoring-program">Volunteer
+          Water Monitoring Program</a>
         that trains volunteers to collect water quality data using a variety
         of DEEP certified methods. To learn more, or to view monitoring
         results, click on the corresponding program tab.
       </p>
+      <hr>
+
+      <h5 class="offcanvas-title" id="offcanvasExampleLabel">Riffle Bioassessment by Volunteers (RBV)</h5>
+      <p>
+        The <a
+          href="https://portal.ct.gov/deep/water/inland-water-monitoring/riffle-bioassessment-by-volunteers-rbv">RBV
+          program</a> trains volunteers to collect benthic macroinvertebrates from suspected high-quality streams.
+        The RBV tab displays past RBV results, categorized by the number of "most wanted" (highly pollution sensitive)
+        taxa found at each site.
+        <br><br>
+        Sites with four or more "most wanted" (MW) taxa are able to be assessed as fully supporting aquatic life use as
+        part of Connecticut's
+        <a href="https://portal.ct.gov/deep/water/water-quality/water-quality-305b-report-to-congress">Integrated Water
+          Quality Report to Congress</a>.
+        These sites are displayed as yellow circles on the map, and all other sites are displayed as smaller blue
+        circles. <b>Click on the circles for more information about the site.</b>
+        <br><br>
+        Areas of the map that are shaded green are predicted to have high water quality. <b>If no assessment (blue or
+          red line) has been made on a stream in a green watershed,
+          that is a great location to target RBV monitoring!</b>
+      </p>
+      <hr>
+
+      <h5 class="offcanvas-title" id="offcanvasExampleLabel">Volunteer Stream Temperature Monitoring (VSTeM) Network
+      </h5>
+      <p>
+        The <a
+          href="https://portal.ct.gov/deep/water/inland-water-monitoring/volunteer-stream-temperature-monitoring-network">VSTeM
+          Network</a> trains volunteers to collect continuous stream temperature data using temperature loggers.
+
+        Data from this program is used to support CT DEEP Water Monitoring's larger efforts to map <a
+          href="https://portal.ct.gov/deep/water/inland-water-monitoring/cold-water-stream-habitat-map">coldwater
+          habitat</a> in the state.
+        <br><br>
+        The shaded blue areas are watersheds predicted to be coldwater that must be confirmed by temperature data. Sites confirmed
+        to be coldwater are shown as blue circles. Other monitored sites are shown as smaller black
+        circles. <b>Click on the circles for more information about the site.</b>
+      </p>
+      <hr>
+
+      <h5 class="offcanvas-title" id="offcanvasExampleLabel">Connecticut Lake Watch</h5>
+      <p>
+        The <a href = "https://portal.ct.gov/deep/water/inland-water-monitoring/connecticut-lake-watch">CT Lake Watch</a> program trains volunteers 
+        to monitor lake/pond water clarity using a Secchi disk and thermometer. <b>To view a report summarizing CT Lake Watch results for each monitored lake,
+        click on the site and follow the link. </b>
+      </p>
+
+
+
       <hr />
       <h3 class="py-2">Questions?</h3>
       <ul class="list-unstyled">
@@ -411,7 +453,31 @@ appears from horizontal start (left) of viewport. -->
           <b>Max result:</b> ${maxScore} MW in ${maxScoreYear}<br>
           <b>Most recent result:</b> ${recentScore} MW in ${recentScoreYear} <br>
           <a href = "https://www.waterqualitydata.us/data/ActivityMetric/search?siteid=CTVOLMON-${siteID}&project=CT-VOLMON-RBV&mimeType=csv&zip=no&providers=NWIS&providers=STORET">
-            Download historical data</a>`, {});
+            Download site data</a>`, {});
+
+          // now want to add mouse on/mouse off functionality to indicate something happens when you click
+
+          const originalColor = layer.options.fillColor; // my original category dependent colors
+
+          layer.on('mouseover', function () {
+            // when you hover on a point
+            let highlightColor;
+            if (maxScore >= 4) {
+              highlightColor = "#FFED46"; // lighter brand standard yellow
+            } else {
+              highlightColor = "#68CEF2"; // lighter brand standard blue
+            }
+
+            layer.setStyle({ // change the fill color
+              fillColor: highlightColor,
+            });
+          });
+
+          layer.on('mouseout', function () { // put the fill color back to the original color
+            layer.setStyle({
+              fillColor: originalColor,
+            });
+          });
         },
       });
       return RBVsites; // return the RBVsites layer
@@ -530,9 +596,33 @@ appears from horizontal start (left) of viewport. -->
             classification = "Warm";
           }
 
-          // info for decision-making (site selection)
-          layer.bindTooltip(`<b>${siteName}:</b> ${siteID} <br>
-          <b>Classification:</b> ${classification}`, {});
+          // info for decision-making (site selection).. now also a popup for downloading data
+          layer.bindPopup(`<b>${siteName}:</b> ${siteID} <br>
+          <b>Classification:</b> ${classification} <br>
+          <a href = "https://www.waterqualitydata.us/data/Result/search?siteid=CTVOLMON-${siteID}&project=CT-VOLMON-VSTEM&mimeType=csv&zip=no&dataProfile=resultPhysChem&providers=NWIS&providers=STORET">
+            Download site data</a>`, {});
+
+          const originalColor = layer.options.fillColor; // my original category dependent colors
+
+          layer.on('mouseover', function () {
+            // when you hover on a point
+            let highlightColor;
+            if (classScore === 1) {
+              highlightColor = "#68CEF2"; // lighter brand standard blue
+            } else {
+              highlightColor = "#b0b0b0"; // grey
+            }
+
+            layer.setStyle({ // change the fill color
+              fillColor: highlightColor,
+            });
+          });
+
+          layer.on('mouseout', function () { // put the fill color back to the original color
+            layer.setStyle({
+              fillColor: originalColor,
+            });
+          });
         },
       });
       return VSTeMsites;
@@ -581,8 +671,9 @@ appears from horizontal start (left) of viewport. -->
 
           // these are popups so you can touch the link
           layer.bindPopup(
-          `<b>${siteName}</b> <br>
-          <a href = "data/reports/${siteName}.html">View interactive report</a>`, {}); // i evidently need to update my rmd code with some new 2024 sites
+            `<b>${siteName}</b> <br>
+          <a href = "data/reports/${siteName}.html">View interactive report</a>`, {}
+          ); // i evidently need to update my rmd code with some new 2024 sites
           layer.on('mouseover', function () {
             this.setStyle({
               fillColor: "#9ECf7C", // trying to indicate something happens when you click on the point
