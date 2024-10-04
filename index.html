@@ -147,6 +147,16 @@
       right: 10px;
     }
 
+    .offcanvas-header{ /* tweaking this bc i have a lot of text :,) */
+      width: 500px;
+      
+    }
+
+    .offcanvas-body { /* tweaking this bc i have a lot of text :,) */
+      width: 500px;
+      
+    }
+
     /* Small devices (landscape phones, 576px and up) */
     @media (min-width: 576px) {}
 
@@ -207,11 +217,14 @@
 appears from horizontal start (left) of viewport. -->
   <div class="offcanvas offcanvas-start bg-dark text-white" tabindex="-1" id="offcanvasExample"
     aria-labelledby="offcanvasExampleLabel">
-    <div class="offcanvas-header">
+    
+    
+ <!--   <div class="offcanvas-header"> -->
 
       <!-- Button to close off-canvas element. -->
-      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-    </div>
+     <!-- <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button> -->
+      <!-- i find it intuitive to click off the body to close the offcanvas but i may put this back -->
+  <!--    </div> -->
     <div class="offcanvas-body">
       <h3 class="py-2">Volunteer Water Monitoring in Connecticut</h3>
       <p>
@@ -256,7 +269,8 @@ appears from horizontal start (left) of viewport. -->
           href="https://portal.ct.gov/deep/water/inland-water-monitoring/cold-water-stream-habitat-map">coldwater
           habitat</a> in the state.
         <br><br>
-        The shaded blue areas are watersheds predicted to be coldwater that must be confirmed by temperature data. Sites confirmed
+        The shaded blue areas are watersheds predicted to be coldwater that must be confirmed by temperature data. Sites
+        confirmed
         to be coldwater are shown as blue circles. Other monitored sites are shown as smaller black
         circles. <b>Click on the circles for more information about the site.</b>
       </p>
@@ -264,9 +278,11 @@ appears from horizontal start (left) of viewport. -->
 
       <h5 class="offcanvas-title" id="offcanvasExampleLabel">Connecticut Lake Watch</h5>
       <p>
-        The <a href = "https://portal.ct.gov/deep/water/inland-water-monitoring/connecticut-lake-watch">CT Lake Watch</a> program trains volunteers 
-        to monitor lake/pond water clarity using a Secchi disk and thermometer. <b>To view a report summarizing CT Lake Watch results for each monitored lake,
-        click on the site and follow the link. </b>
+        The <a href="https://portal.ct.gov/deep/water/inland-water-monitoring/connecticut-lake-watch">CT Lake Watch</a>
+        program trains volunteers
+        to monitor lake and pond water clarity using a Secchi disk and thermometer. <b>To view a report summarizing CT Lake
+          Watch results for each monitored lake,
+          click on the site and follow the link. </b>
       </p>
 
 
