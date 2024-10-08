@@ -211,8 +211,7 @@
 <body>
   <header>
     <h1>
-      <a href="https://portal.ct.gov/deep/water/inland-water-monitoring/volunteer-water-monitoring-program"><img
-          src="graphics/DEEP_Primary_Seal_Reverse_150px.png" width="70px" /></a>
+      <a href = "https://portal.ct.gov/deep/water/inland-water-monitoring/volunteer-water-monitoring-program"><img src="graphics/DEEP_Primary_Seal_Reverse_150px.png" width="70px" /></a>
       Volunteer Monitoring Mapping Application (Beta)
     </h1>
 
@@ -394,14 +393,25 @@ appears from horizontal start (left) of viewport. -->
     );
 
 
-    // fetch data.. data points from WQP (R script), watershed polys from internal data, river lines from integrated report
-    fetch("data/assessed_river.geojson")
+    // fetch data.. data points from WQP, polys from internal data, river lines from integrated report
+    // boundary first as it never changes
+    fetch("data/ct_boundary.geojson") // also need to make this draw on top of the other layers
+      .then(function (response) {
+        return response.json();
+      })
+      .then(function (data) {
+        setActiveTab("RBV"); // active by default
+        drawRBVLegend(); // drawn by default
+        drawBoundary(data); // function for each type of data
+        // return a new fetch call and continue the chain
+        return fetch("data/assessed_river.geojson");
+      })
       .then(function (response) {
         return response.json();
       })
       .then(function (data) {
         streams = drawStreams(data); // initial styling
-        blueStreams = drawBlueStreams(data); // alt styling for vstem (dont care abt assessments)
+        blueStreams = drawBlueStreams(data);
         streams.addTo(map);
         // return a new fetch call and continue the chain
         return fetch("data/rbv_watersheds.geojson");
@@ -438,6 +448,7 @@ appears from horizontal start (left) of viewport. -->
       .then(function (data) {
         VSTeMsites = drawVSTeM(data);
         // return a new fetch call and continue the chain
+
         return fetch("data/CTLWsites.geojson");
       })
       .then(function (response) {
@@ -445,18 +456,7 @@ appears from horizontal start (left) of viewport. -->
       })
       .then(function (data) {
         CTLWsites = drawCTLW(data);
-        // now want to draw boundary last so it sits on top
-        return fetch("data/ct_boundary.geojson");
-      })
-      .then(function (response) {
-        return response.json();
-      })
-      .then(function (data) {
-        setActiveTab("RBV"); // active by default
-        drawRBVLegend(); // drawn by default
-        drawBoundary(data); // draw boundary last
       });
-
 
     // i am going to create functions for drawing each "type" of data, then figure out how to link interactivity to the tabs
 
@@ -773,7 +773,7 @@ appears from horizontal start (left) of viewport. -->
             layer
               .openTooltip(); // open tooltip for more info, this is helpful for when multiple stream segments match
             found =
-              true; // also because i have annoyingly discovered the name format can be like salmon brook, west branch >:(
+            true; // also because i have annoyingly discovered the name format can be like salmon brook, west branch >:(
           } // which is not how we would call the associated site!
         });
       }
