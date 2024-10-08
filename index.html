@@ -74,7 +74,7 @@
       justify-content: center;
     }
 
-    .btn-custom {
+    .btn-info {
       /* i want button right aligned, centered with respect to the vertical axis */
       background-color: #00aae7;
       color: white;
@@ -83,7 +83,20 @@
       margin-bottom: 23px;
     }
 
-    .btn-custom:hover {
+    .btn-info:hover {
+      background-color: #68cef2;
+      color: white;
+      border: 0.5px solid white;
+    }
+
+    .btn-search {
+      /* i want button right aligned, centered with respect to the vertical axis */
+      background-color: #00aae7;
+      color: white;
+      border: 0.5px solid white;
+    }
+
+    .btn-search:hover {
       background-color: #68cef2;
       color: white;
       border: 0.5px solid white;
@@ -147,14 +160,33 @@
       right: 10px;
     }
 
-    .offcanvas-header{ /* tweaking this bc i have a lot of text :,) */
-      width: 500px;
-      
+    #search-container {
+      position: absolute;
+      bottom: 50px;
+      right: 40px;
+      z-index: 1000;
+      background-color: white;
+      padding: 10px;
+      border-radius: 5px;
+      border-color: #0d2d6c;
     }
 
-    .offcanvas-body { /* tweaking this bc i have a lot of text :,) */
+    #search {
+      width: 200px;
+      padding: 5px;
+    }
+
+
+    .offcanvas-header {
+      /* tweaking this bc i have a lot of text :,) */
       width: 500px;
-      
+
+    }
+
+    .offcanvas-body {
+      /* tweaking this bc i have a lot of text :,) */
+      width: 500px;
+
     }
 
     /* Small devices (landscape phones, 576px and up) */
@@ -187,7 +219,7 @@
     </div>
 
     <div class="header-info">
-      <a class="btn btn-custom" data-bs-toggle="offcanvas" href="#offcanvasExample" role="button"
+      <a class="btn btn-info" data-bs-toggle="offcanvas" href="#offcanvasExample" role="button"
         aria-controls="offcanvasExample">
         Map Info
       </a>
@@ -204,6 +236,13 @@
       <!-- legends will go here -->
       <div id="legend" class="position-absolute shadow-sm p-2 bg-light square-2"></div>
 
+      <!-- search box here here -->
+      <div id="search-container" class="position-absolute shadow-sm p-2 bg-light square-2">
+        <input type="text" id="search" placeholder="Search by stream or lake">
+        <button class="btn btn-search" onclick="searchLayer()">Search</button>
+      </div>
+
+
     </div>
   </section>
 
@@ -217,14 +256,14 @@
 appears from horizontal start (left) of viewport. -->
   <div class="offcanvas offcanvas-start bg-dark text-white" tabindex="-1" id="offcanvasExample"
     aria-labelledby="offcanvasExampleLabel">
-    
-    
- <!--   <div class="offcanvas-header"> -->
 
-      <!-- Button to close off-canvas element. -->
-     <!-- <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button> -->
-      <!-- i find it intuitive to click off the body to close the offcanvas but i may put this back -->
-  <!--    </div> -->
+
+    <!--   <div class="offcanvas-header"> -->
+
+    <!-- Button to close off-canvas element. -->
+    <!-- <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button> -->
+    <!-- i find it intuitive to click off the body to close the offcanvas but i may put this back -->
+    <!--    </div> -->
     <div class="offcanvas-body">
       <h3 class="py-2">Volunteer Water Monitoring in Connecticut</h3>
       <p>
@@ -280,7 +319,8 @@ appears from horizontal start (left) of viewport. -->
       <p>
         The <a href="https://portal.ct.gov/deep/water/inland-water-monitoring/connecticut-lake-watch">CT Lake Watch</a>
         program trains volunteers
-        to monitor lake and pond water clarity using a Secchi disk and thermometer. <b>To view a report summarizing CT Lake
+        to monitor lake and pond water clarity using a Secchi disk and thermometer. <b>To view a report summarizing CT
+          Lake
           Watch results for each monitored lake,
           click on the site and follow the link. </b>
       </p>
@@ -706,6 +746,39 @@ appears from horizontal start (left) of viewport. -->
         },
       });
       return CTLWsites;
+    }
+
+
+    // search feature
+    function searchLayer() {
+      const searchValue = document.getElementById('search').value.toLowerCase();
+
+      let found = false; // default flag to see if stream was found or not
+
+      // search by stream name
+      function searchInStreams(layerGroup) {
+        layerGroup.eachLayer(function (layer) {
+          const segmentName = layer.feature.properties.ASSESSME_1 ? layer.feature.properties.ASSESSME_1
+            .toLowerCase().trim() : ''; // additional trimming/formatting so things are matched correctly
+
+          // if the search includes the name
+          if (segmentName.includes(searchValue)) {
+            // zoom to the location of the stream
+            map.setView(layer.getBounds().getCenter(), 13); // adjust zoom
+            layer
+          .openTooltip(); // open tooltip for more info, this is helpful for when multiple stream segments match
+            found = true;
+          }
+        });
+      }
+
+      // call only this function for now
+      searchInStreams(streams);
+
+      // if not found
+      if (!found) {
+        alert('No match found');
+      }
     }
 
 
