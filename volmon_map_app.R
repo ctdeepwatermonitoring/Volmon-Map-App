@@ -160,9 +160,12 @@ st_write(vstem_sf , "VSTeMclasses.geojson", driver = "GeoJSON") # export as geoj
 
 ctlw <- read.csv("https://www.waterqualitydata.us/data/Station/search?project=CTLakeWatch&project=Connecticut%20Lake%20Watch&mimeType=csv&zip=no&providers=NWIS&providers=STORET")
 ctlw <- ctlw[!duplicated(ctlw[c("MonitoringLocationName")]), ] # different data source so this is the important identifier
-ctlw <- ctlw[c("MonitoringLocationName", "MonitoringLocationIdentifier", "LatitudeMeasure",
+ctlw_sites <- read.csv("ctlw_stations.csv") # manual relational df for the ctlw report generation
+ctlw_filtered <- ctlw %>%
+  filter(MonitoringLocationName %in% ctlw_sites$MonitoringLocationName)
+ctlw_filtered <- ctlw_filtered[c("MonitoringLocationName", "MonitoringLocationIdentifier", "LatitudeMeasure",
                "LongitudeMeasure")] # no result info/site category (for now!)
-ctlw_sf <- ctlw %>%
+ctlw_sf <- ctlw_filtered %>%
   st_as_sf(coords = c("LongitudeMeasure", "LatitudeMeasure"), crs = 4326)
 st_write(ctlw_sf , "CTLWsites.geojson", driver = "GeoJSON") # export as geojson!
   
