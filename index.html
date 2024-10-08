@@ -404,6 +404,15 @@ appears from horizontal start (left) of viewport. -->
         drawRBVLegend(); // drawn by default
         drawBoundary(data); // function for each type of data
         // return a new fetch call and continue the chain
+        return fetch("data/rbv_watersheds.geojson");
+      })
+      .then(function (response) {
+        return response.json();
+      })
+      .then(function (data) {
+        RBVWS = drawRBVWS(data);
+        RBVWS.addTo(map); // display by default
+        // return a new fetch call and continue the chain
         return fetch("data/assessed_river.geojson");
       })
       .then(function (response) {
@@ -414,15 +423,7 @@ appears from horizontal start (left) of viewport. -->
         blueStreams = drawBlueStreams(data);
         streams.addTo(map);
         // return a new fetch call and continue the chain
-        return fetch("data/rbv_watersheds.geojson");
-      })
-      .then(function (response) {
-        return response.json();
-      })
-      .then(function (data) {
-        RBVWS = drawRBVWS(data);
-        RBVWS.addTo(map); // display by default
-        // return a new fetch call and continue the chain
+
         return fetch("data/RBVmetrics.geojson");
       })
       .then(function (response) {
