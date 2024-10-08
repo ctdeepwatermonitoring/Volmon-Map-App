@@ -766,14 +766,16 @@ appears from horizontal start (left) of viewport. -->
             // zoom to the location of the stream
             map.setView(layer.getBounds().getCenter(), 13); // adjust zoom
             layer
-          .openTooltip(); // open tooltip for more info, this is helpful for when multiple stream segments match
-            found = true;
-          }
+              .openTooltip(); // open tooltip for more info, this is helpful for when multiple stream segments match
+            found =
+            true; // also because i have annoyingly discovered the name format can be like salmon brook, west branch >:(
+          } // which is not how we would call the associated site!
         });
       }
 
-      // call only this function for now
+      // call the searching functions
       searchInStreams(streams);
+      searchInStreams(blueStreams); // this works for both since it is basically the same layer
 
       // if not found
       if (!found) {
