@@ -243,7 +243,7 @@
 
       <!-- search box here here -->
       <div id="search-container" class="position-absolute shadow-sm p-2 bg-light square-2">
-        <input type="text" id="search" placeholder="Search by stream name">
+        <input type="text" id="search" placeholder="Search by stream or town">
         <button class="btn btn-search" onclick="searchLayer()">Search</button>
       </div>
 
@@ -794,7 +794,7 @@ appears from horizontal start (left) of viewport. -->
 
     function drawRBVLegend() {
       const legendDiv = document.getElementById("legend");
-      legendDiv.innerHTML = `<h4>RBV Sites</h4>
+      legendDiv.innerHTML = `<h4>RBV Monitoring</h4>
     <span style="color:#FDB515; font-size: 24px;">&#9679;</span> 4 or more most wanted<br>
     <span style="color:#0D2D6C; font-size: 24px;">&#9679;</span> 3 or less most wanted<br>
     <span style="color:#9ECF7C; font-size: 24px;">&#9632;</span> High priority watersheds<br>
@@ -807,11 +807,11 @@ appears from horizontal start (left) of viewport. -->
 
     function drawVSTeMLegend() {
       const legendDiv = document.getElementById("legend");
-      legendDiv.innerHTML = `<h4>VSTeM Sites</h4>
+      legendDiv.innerHTML = `<h4>VSTeM Network</h4>
     <span style="color:#00AAE7; font-size: 24px;">&#9679;</span> Confirmed coldwater habitat<br>
     <span style="color:#000000; font-size: 24px;">&#9679;</span> Other monitored sites <br>
     <span style="color:#68CEF2; font-size: 24px;">&#9632;</span> Predicted coldwater habitat<br>
-    <span style="color:#0D2D6C; font-size: 20px;"> ▎</span> Stream segment`;
+    <span style="color:#0D2D6C; font-size: 20px;">  ▎</span> Stream segment`;
     }
 
     function drawCTLWLegend() {
