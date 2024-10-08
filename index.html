@@ -32,6 +32,11 @@
       font-size: 150%;
     }
 
+    h4 {
+      font-weight: 500;
+      font-size: 120%;
+    }
+
     p {
       line-height: 1.7rem;
     }
@@ -206,7 +211,7 @@
 <body>
   <header>
     <h1>
-      <img src="graphics/DEEP_Primary_Seal_Reverse_150px.png" width="70px" />
+      <a href = "https://portal.ct.gov/deep/water/inland-water-monitoring/volunteer-water-monitoring-program"><img src="graphics/DEEP_Primary_Seal_Reverse_150px.png" width="70px" /></a>
       Volunteer Monitoring Mapping Application (Beta)
     </h1>
 
@@ -238,7 +243,7 @@
 
       <!-- search box here here -->
       <div id="search-container" class="position-absolute shadow-sm p-2 bg-light square-2">
-        <input type="text" id="search" placeholder="Search by stream or lake">
+        <input type="text" id="search" placeholder="Search by stream name">
         <button class="btn btn-search" onclick="searchLayer()">Search</button>
       </div>
 
@@ -733,7 +738,7 @@ appears from horizontal start (left) of viewport. -->
           layer.on('mouseover', function () {
             this.setStyle({
               fillColor: "#9ECf7C", // trying to indicate something happens when you click on the point
-              color: "#9ECf7C"
+              color: "black"
             });
           });
 
@@ -789,23 +794,30 @@ appears from horizontal start (left) of viewport. -->
 
     function drawRBVLegend() {
       const legendDiv = document.getElementById("legend");
-      legendDiv.innerHTML = `<h2>RBV Sites</h2>
-    <p><span style="color:#FDB515; font-size: 24px;">&#9679;</span> 4 or more most wanted</p> 
-    <p><span style="color:#0D2D6C; font-size: 24px;">&#9679;</span> 3 or less most wanted</p>
-    <p><span style="color:#9ECF7C; font-size: 24px;">&#9679;</span> High priority watersheds</p>`;
+      legendDiv.innerHTML = `<h4>RBV Sites</h4>
+    <span style="color:#FDB515; font-size: 24px;">&#9679;</span> 4 or more most wanted<br>
+    <span style="color:#0D2D6C; font-size: 24px;">&#9679;</span> 3 or less most wanted<br>
+    <span style="color:#9ECF7C; font-size: 24px;">&#9632;</span> High priority watersheds<br>
+    <br>
+    <h4>2022 Assessed Rivers<br>(Aquatic Life Use)</h4>
+    <span style="color:#00AAE7; font-size: 20px;"> ▎</span> Fully supporting ALUS<br>
+    <span style="color:#c20d0d; font-size: 20px;"> ▎</span> Not supporting ALUS
+    `;
     }
 
     function drawVSTeMLegend() {
       const legendDiv = document.getElementById("legend");
-      legendDiv.innerHTML = `<h2>VSTeM Sites</h2>
-    <p><span style="color:#00AAE7; font-size: 24px;">&#9679;</span> Coldwater habitat</p>
-    <p><span style="color:#000000; font-size: 24px;">&#9679;</span> Other sites</p>`;
+      legendDiv.innerHTML = `<h4>VSTeM Sites</h4>
+    <span style="color:#00AAE7; font-size: 24px;">&#9679;</span> Confirmed coldwater habitat<br>
+    <span style="color:#000000; font-size: 24px;">&#9679;</span> Other monitored sites <br>
+    <span style="color:#68CEF2; font-size: 24px;">&#9632;</span> Predicted coldwater habitat<br>
+    <span style="color:#0D2D6C; font-size: 20px;"> ▎</span> Stream segment`;
     }
 
     function drawCTLWLegend() {
       const legendDiv = document.getElementById("legend");
-      legendDiv.innerHTML = `<h2>CT Lake Watch Sites</h2>
-    <p><span style="color:#23AE49; font-size: 24px;">&#9679;</span> Monitored lake</p>`;
+      legendDiv.innerHTML = `<h4>CT Lake Watch Sites</h4>
+    <span style="color:#23AE49; font-size: 24px;">&#9679;</span> Monitored lake`;
     }
 
     // tab magic
