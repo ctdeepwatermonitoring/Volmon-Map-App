@@ -423,7 +423,6 @@ appears from horizontal start (left) of viewport. -->
         blueStreams = drawBlueStreams(data);
         streams.addTo(map);
         // return a new fetch call and continue the chain
-
         return fetch("data/RBVmetrics.geojson");
       })
       .then(function (response) {
@@ -770,7 +769,7 @@ appears from horizontal start (left) of viewport. -->
           // if the search includes the name
           if (segmentName.includes(searchValue)) {
             // zoom to the location of the stream
-            map.setView(layer.getBounds().getCenter(), 13); // adjust zoom
+            map.setView(layer.getBounds().getCenter(), 12); // adjust zoom
             layer
               .openTooltip(); // open tooltip for more info, this is helpful for when multiple stream segments match
             found =
