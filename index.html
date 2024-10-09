@@ -189,7 +189,6 @@
     }
 
     .offcanvas-body {
-      /* tweaking this bc i have a lot of text :,) */
       width: 500px;
 
     }
@@ -211,7 +210,8 @@
 <body>
   <header>
     <h1>
-      <a href = "https://portal.ct.gov/deep/water/inland-water-monitoring/volunteer-water-monitoring-program"><img src="graphics/DEEP_Primary_Seal_Reverse_150px.png" width="70px" /></a>
+      <a href="https://portal.ct.gov/deep/water/inland-water-monitoring/volunteer-water-monitoring-program"><img
+          src="graphics/DEEP_Primary_Seal_Reverse_150px.png" width="70px" /></a>
       Volunteer Monitoring Mapping Application (Beta)
     </h1>
 
@@ -395,9 +395,10 @@ appears from horizontal start (left) of viewport. -->
 
     // fetch data.. data points from WQP, polys from internal data, river lines from integrated report
     // boundary first as it never changes
-    fetch("data/ct_boundary.geojson") // also need to make this draw on top of the other layers
-      .then(function (response) {
-        return response.json();
+    fetch("data/ct_boundary.geojson") // if i add boundary last, it messes with the ability to mouse over RBV sites?
+      .then(function (response) { // it just looks silly in the SE corner where the river line == the boundary
+        return response
+          .json(); // though there is an argument to be made that it should be easy to mouse over the river there still
       })
       .then(function (data) {
         setActiveTab("RBV"); // active by default
@@ -420,7 +421,7 @@ appears from horizontal start (left) of viewport. -->
       })
       .then(function (data) {
         streams = drawStreams(data); // initial styling
-        blueStreams = drawBlueStreams(data);
+        blueStreams = drawBlueStreams(data); // alt styling for vstem tab, not yet added to map
         streams.addTo(map);
         // return a new fetch call and continue the chain
         return fetch("data/RBVmetrics.geojson");
@@ -448,7 +449,6 @@ appears from horizontal start (left) of viewport. -->
       .then(function (data) {
         VSTeMsites = drawVSTeM(data);
         // return a new fetch call and continue the chain
-
         return fetch("data/CTLWsites.geojson");
       })
       .then(function (response) {
@@ -458,7 +458,7 @@ appears from horizontal start (left) of viewport. -->
         CTLWsites = drawCTLW(data);
       });
 
-    // i am going to create functions for drawing each "type" of data, then figure out how to link interactivity to the tabs
+    // one function for each type of data since the structure is entirely different
 
     // boundary data - this never changes
     function drawBoundary(data) {
@@ -476,9 +476,8 @@ appears from horizontal start (left) of viewport. -->
     // rbv sites with color coding
     function drawRBV(data) {
       const RBVsites = L.geoJson(data, {
-        // i think i will group the data  by the const and tie it to the tabs?
         pointToLayer: function (feature, latlng) {
-          // either 4+ site or <4 site
+          // either 4+ site or <4 site (ie assessment could be made, or no assessment decision)
           const maxScore = feature.properties.MaxScore;
           let color;
           let radius;
@@ -491,7 +490,6 @@ appears from horizontal start (left) of viewport. -->
           }
 
           return L.circleMarker(latlng, {
-            // i may make this a nicer symbol? but this looks not bad to start
             radius: radius,
             fillColor: color,
             color: "black",
@@ -500,8 +498,11 @@ appears from horizontal start (left) of viewport. -->
             fillOpacity: 1,
           });
         },
+
         onEachFeature: function (feature, layer) {
-          // tooltip params
+          // tooltip params, refactored from the original format of each year being a column
+          // i think this information drills down to what people actually reference
+          // without forcing most data to be NA for most years
           const siteName = feature.properties.MonitoringLocationName;
           const siteID = feature.properties.MonitoringLocationIdentifier;
           const maxScore = feature.properties.MaxScore;
@@ -509,15 +510,14 @@ appears from horizontal start (left) of viewport. -->
           const recentScore = feature.properties.RecentScore;
           const recentScoreYear = feature.properties.RecentYear;
 
-          // info for decision-making (site selection).. now a popup so you can click the WQP link
+          // info for decision-making (site selection).. now a popup so you can click the WQP link easier
           layer.bindPopup(`<b>${siteName}:</b> ${siteID} <br> 
           <b>Max result:</b> ${maxScore} MW in ${maxScoreYear}<br>
           <b>Most recent result:</b> ${recentScore} MW in ${recentScoreYear} <br>
           <a href = "https://www.waterqualitydata.us/data/ActivityMetric/search?siteid=CTVOLMON-${siteID}&project=CT-VOLMON-RBV&mimeType=csv&zip=no&providers=NWIS&providers=STORET">
             Download site data</a>`, {});
 
-          // now want to add mouse on/mouse off functionality to indicate something happens when you click
-
+          // mouse on/mouse off functionality to indicate something happens when you click
           const originalColor = layer.options.fillColor; // my original category dependent colors
 
           layer.on('mouseover', function () {
@@ -528,7 +528,6 @@ appears from horizontal start (left) of viewport. -->
             } else {
               highlightColor = "#68CEF2"; // lighter brand standard blue
             }
-
             layer.setStyle({ // change the fill color
               fillColor: highlightColor,
             });
@@ -544,7 +543,7 @@ appears from horizontal start (left) of viewport. -->
       return RBVsites; // return the RBVsites layer
     }
 
-    //rbv high prio watersheds
+    //rbv high prio watersheds (watersheds with predicted MMI score >75, ie  predicted excellent water quality)
     function drawRBVWS(data) {
       const RBVWS = L.geoJson(data, {
         style: function (feature, latlng) {
@@ -566,12 +565,15 @@ appears from horizontal start (left) of viewport. -->
       const streams = L.geoJson(data, {
         style: function (feature) {
           let color;
-          // style based on active tab and layer info (informational vs decision making)
-          const assessment = feature.properties.CT2022_A_1; // ALUS assessment determination
+          // for this layer, the color is dependent upon the assessment decision
+          // i originally tried to have one drawStreams function work for both tabs with different styling for each tab but it got messy 
+
+          const assessment = feature.properties
+            .CT2022_A_1; // ALUS (aquatic life use standard) assessment determination
           if (assessment === "Fully Supporting") {
             color = "#00AAE7"; // light blue for full support
           } else if (assessment === "Not Supporting") {
-            color = "#c20d0d"; // red for not supporting
+            color = "#c20d0d"; // red for not supporting (we don't want people to sample there)
           } else {
             color = "#595959"; // grey for non-assessed lines
           }
@@ -581,12 +583,14 @@ appears from horizontal start (left) of viewport. -->
             opacity: 1,
           };
         },
+
         onEachFeature: function (feature, layer) {
           // tooltip params
           const segmentName = feature.properties.ASSESSME_1;
           const assessment = feature.properties.CT2022_A_1;
 
           // info for decision-making (site selection)
+          // i hope the tooltip jargon (e.g. 'ALUS' is clearer with the updated legend)
           layer.bindTooltip(`<b>${segmentName}:</b> <br>
            ${assessment} ALUS`, {});
         },
@@ -594,6 +598,7 @@ appears from horizontal start (left) of viewport. -->
       return streams;
     }
 
+    // arguably i could still try to find a way to make this one drawStreams function but this works fine
     function drawBlueStreams(data) {
       const blueStreams = L.geoJson(data, {
         style: function (feature) {
@@ -618,7 +623,7 @@ appears from horizontal start (left) of viewport. -->
     function drawVSTeM(data) {
       const VSTeMsites = L.geoJson(data, {
         pointToLayer: function (feature, latlng) {
-          // either cold or not cold site (for now)
+          // either cold or not cold site (we don't really care about cool vs warm distinction for this project)
           const minScore = feature.properties.MinClassScore;
           let color;
           let radius;
@@ -626,13 +631,13 @@ appears from horizontal start (left) of viewport. -->
             // my coldwater site classification
             color = "#00AAE7";
             radius = 6;
-          } else {
+          } else { // all other sites
             color = "black";
             radius = 3.5;
           }
 
           return L.circleMarker(latlng, {
-            // temp symbology to differentiate from rbv sites
+            // trying to make this symbology distinct from RBV layer
             radius: radius,
             fillColor: color,
             color: "black",
@@ -641,6 +646,7 @@ appears from horizontal start (left) of viewport. -->
             fillOpacity: 1,
           });
         },
+
         onEachFeature: function (feature, layer) {
           // tooltip params
           const siteName = feature.properties.MonitoringLocationName;
@@ -658,10 +664,14 @@ appears from horizontal start (left) of viewport. -->
           }
 
           // info for decision-making (site selection).. now also a popup for downloading data
-          layer.bindPopup(`<b>${siteName}:</b> ${siteID} <br>
+          layer.bindPopup(
+            `<b>${siteName}:</b> ${siteID} <br>
           <b>Classification:</b> ${classification} <br>
           <a href = "https://www.waterqualitydata.us/data/Result/search?siteid=CTVOLMON-${siteID}&project=CT-VOLMON-VSTEM&mimeType=csv&zip=no&dataProfile=resultPhysChem&providers=NWIS&providers=STORET">
-            Download site data</a>`, {});
+            Download site data</a>`, {}
+          ); // you can see all classifications that have been made for a site here as some years will get different results
+          // my R code "assesses" the site based upon their coolest result since that makes the most sense to me and it needs to make a decision as the year-by-year results could change
+          // this is the same logic as RBV assessments (yellow circle/historically a star if it every got 4 or more MW taxa)
 
           const originalColor = layer.options.fillColor; // my original category dependent colors
 
@@ -689,7 +699,7 @@ appears from horizontal start (left) of viewport. -->
       return VSTeMsites;
     }
 
-    //coldwater hab watersheds
+    // predicted coldwater habitat watersheds.. the vstem program seeks to confirm these as coldwater with actual logger data
     function drawCWWS(data) {
       const CWWS = L.geoJson(data, {
         style: function (feature, latlng) {
@@ -728,13 +738,18 @@ appears from horizontal start (left) of viewport. -->
         },
         onEachFeature: function (feature, layer) {
           // tooltip params
-          const siteName = feature.properties.MonitoringLocationName;
+          const siteName = feature.properties
+            .MonitoringLocationName; // my R code now harmonizes this list of monitoring locations with the list
+          // that i generated the lake watch reports from. it was semi manually created because the data was uploaded
+          // sorta from two different databases that handle the relationship between site IDs and lakes differently
+          // one of them is, in my opinion, objectively wrong in how it handles that so i have attempted to fix
+          // that data relationship in a lookup table
 
           // these are popups so you can touch the link
           layer.bindPopup(
             `<b>${siteName}</b> <br>
-          <a href = "data/reports/${siteName}.html">View interactive report</a>`, {}
-          ); // i evidently need to update my rmd code with some new 2024 sites
+          <a href = "data/reports/${siteName}.html">View interactive report</a>`, {} // this is where the bulk of the information is stored/visualized, rather than via symbology or direct WQP download links
+          ); // this program has more "true" volunteers ie citizen scientists instead of professionals, so we have tried to make the information digestible for them
           layer.on('mouseover', function () {
             this.setStyle({
               fillColor: "#9ECf7C", // trying to indicate something happens when you click on the point
@@ -754,7 +769,22 @@ appears from horizontal start (left) of viewport. -->
     }
 
 
-    // search feature
+    // search feature. i keep going back and forth about how i want to implement this as there are many options, so i am interested in feedback here
+    // this works pretty well BUT you run into the expected database-esque query issues where the data is stored in a slightly different format
+    // than what the user inputs. for example, searching for "west branch salmon brook" (what everyone calls it) doesnt work because we apparently
+    // wrote the segment name as "salmon brook, west branch". which is silly and annoying! i think i have to trust that a user would then try for a 
+    // simplified string e.g. salmon brook or just west branch. the fact that the tooltip opens i think also provides visual feedback on what is actually
+    // matched from the search, so they could discover something is named slightly differently from what they inputted
+    // im also testing it on my colleagues and one person tried to search for "wallingford, ct" which didnt work because thats not how the names are formatted
+    // nor what i expected someone to search (useful feedback for me)
+
+    document.getElementById('search').addEventListener('keydown', function (event) {
+      if (event.key ===
+        'Enter') { // i kept naturally hiting the enter key without thinking and was surpised to have it not work
+        searchLayer(); // so you can do it this way now too
+      }
+    });
+
     function searchLayer() {
       const searchValue = document.getElementById('search').value.toLowerCase();
 
@@ -764,7 +794,7 @@ appears from horizontal start (left) of viewport. -->
       function searchInStreams(layerGroup) {
         layerGroup.eachLayer(function (layer) {
           const segmentName = layer.feature.properties.ASSESSME_1 ? layer.feature.properties.ASSESSME_1
-            .toLowerCase().trim() : ''; // additional trimming/formatting so things are matched correctly
+            .toLowerCase() : ''; // so that it matches lower case too
 
           // if the search includes the name
           if (segmentName.includes(searchValue)) {
@@ -773,8 +803,8 @@ appears from horizontal start (left) of viewport. -->
             layer
               .openTooltip(); // open tooltip for more info, this is helpful for when multiple stream segments match
             found =
-            true; // also because i have annoyingly discovered the name format can be like salmon brook, west branch >:(
-          } // which is not how we would call the associated site!
+              true;
+          }
         });
       }
 
@@ -784,13 +814,13 @@ appears from horizontal start (left) of viewport. -->
 
       // if not found
       if (!found) {
-        alert('No match found');
+        alert('No match found\nHint: mouse over a stream to see suggested format'); // can i customize this better to direct a better query if it fails?
       }
     }
 
 
     // creating legends
-    // just using simple bullet points with colors for now until i make the styling actually look nice :,)
+    // am also interested in feedback here on making sure they arent too busy/huge while also communicating all the info
 
     function drawRBVLegend() {
       const legendDiv = document.getElementById("legend");
@@ -800,8 +830,9 @@ appears from horizontal start (left) of viewport. -->
     <span style="color:#9ECF7C; font-size: 24px;">&#9632;</span> High priority watersheds<br>
     <br>
     <h4>2022 Assessed Rivers<br>(Aquatic Life Use)</h4>
-    <span style="color:#00AAE7; font-size: 20px;"> ▎</span> Fully supporting ALUS<br>
-    <span style="color:#c20d0d; font-size: 20px;"> ▎</span> Not supporting ALUS
+    <span style="color:#00AAE7; font-size: 20px;"> ▬</span> Fully supporting ALUS<br>
+    <span style="color:#c20d0d; font-size: 20px;"> ▬</span> Not supporting ALUS<br>
+    <span style="color:#595959; font-size: 20px;"> ▬</span> Not assessed
     `;
     }
 
@@ -811,7 +842,7 @@ appears from horizontal start (left) of viewport. -->
     <span style="color:#00AAE7; font-size: 24px;">&#9679;</span> Confirmed coldwater habitat<br>
     <span style="color:#000000; font-size: 24px;">&#9679;</span> Other monitored sites <br>
     <span style="color:#68CEF2; font-size: 24px;">&#9632;</span> Predicted coldwater habitat<br>
-    <span style="color:#0D2D6C; font-size: 20px;">  ▎</span> Stream segment`;
+    <span style="color:#0D2D6C; font-size: 20px;">  ▬</span> Stream segment`;
     }
 
     function drawCTLWLegend() {
@@ -820,9 +851,11 @@ appears from horizontal start (left) of viewport. -->
     <span style="color:#23AE49; font-size: 24px;">&#9679;</span> Monitored lake/pond`;
     }
 
-    // tab magic
+    // tab functionality, controlled separately for each tab
+    // i am very interested in ways of making this more efficient, the way i wrote it is basically
+    // just what makes sense in my brain
 
-    // tab functionality: RBV.. can i make this more efficient and do all at once?
+    // tab functionality: RBV
     document.querySelector("#RBV").addEventListener("click", function () {
       RBVWS.addTo(map);
       streams.addTo(map);
@@ -843,7 +876,6 @@ appears from horizontal start (left) of viewport. -->
       }
 
       setActiveTab("RBV");
-      // also need to make this work for each map legend
     });
 
     // tab functionality: VSTeM
@@ -895,6 +927,7 @@ appears from horizontal start (left) of viewport. -->
       setActiveTab("CTLW");
     });
 
+    // controls the active class on tabs to provide visual feedback
     function setActiveTab(tabID) {
       // grab all tabs
       const tabs = document.querySelectorAll(".tab");
@@ -917,7 +950,7 @@ appears from horizontal start (left) of viewport. -->
         month: "long",
       });
       const footerText = document.querySelector("footer p");
-      footerText.innerHTML = `${month}, ${year} | CT DEEP Water Monitoring`;
+      footerText.innerHTML = `<b>${month}, ${year} | CT DEEP Water Monitoring</b>`;
     }
   </script>
 </body>

@@ -67,6 +67,15 @@ RBV_merged <- RBV_merged[c("MonitoringLocationIdentifier", "MonitoringLocationNa
                        "LongitudeMeasure", "MaxScore", "MaxScoreYear", "RecentScore", "RecentYear")]
 
 
+# this chunk is commented out because i changed my mind about structuring the 
+# data in this way. maintaining it for the future in case i ever want to make 
+# a map where i use a slider to cycle through results year-by-year
+# which would be interesting but not something i want to implement for this map
+# because it could lead to conclusions that i dont want the public to make
+# e.g. why did this area get bad results after 10 years? i am curious but RBV 
+# data cannot technically be used to draw those conclusions. though i do still 
+# see that pattern in many sites.
+
 
 # RBV_recent <- RBV_formatted %>%
 #   group_by(MonitoringLocationIdentifier.x) %>%
@@ -110,6 +119,7 @@ RBV_merged <- RBV_merged[c("MonitoringLocationIdentifier", "MonitoringLocationNa
 #                          "Year_2013", "Year_2014", "Year_2015", "Year_2016",
 #                          "Year_2017", "Year_2018", "Year_2019", "Year_2020",
                          # "Year_2021", "Year_2022", "Year_2023", "MaxScore")]
+
 
 RBV_sf <- RBV_merged %>%
   st_as_sf(coords = c("LongitudeMeasure", "LatitudeMeasure"), crs = 4326)
