@@ -1,0 +1,7 @@
+{
+    "title": "Volunteer Monitoring Mapping Application",
+    "info": "This is a mapping application created to visualize and explore data from CT DEEP's three volunteer water monitoring programs: the Riffle Bioassessment by Volunteers (RBV) program, the Volunteer Stream Temperature Monitoring (VSTeM) Network, and Connecticut Lake Watch. Data from each program can be viewed by clicking on the corresponding tab. Additional site information is available for download/viewing on the tooltip associated with each site.",
+    "coordinates": [41.5300, -72.6736],
+    "author": "Chloe Edwards",
+    "link": "https://c-edwards-eco.github.io/Volmon-Map-App/"
+}
