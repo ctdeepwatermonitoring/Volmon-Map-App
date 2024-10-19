@@ -24,7 +24,7 @@
 
     h1 {
       font-weight: 500;
-      font-size: 250%;
+      font-size: 200%;
     }
 
     h2 {
@@ -148,6 +148,12 @@
       /* illusion of it being flush with the map like file tabs when active */
     }
 
+    .info-message {
+      margin-right: 5px;
+      font-size: 14px;
+      color: #fff;
+    }
+
     #map {
       /* height is set in JS */
       background: #494848;
@@ -190,7 +196,6 @@
 
     .offcanvas-body {
       width: 500px;
-
     }
 
     /* Small devices (landscape phones, 576px and up) */
@@ -215,6 +220,7 @@
       Volunteer Monitoring Mapping Application (Beta)
     </h1>
 
+ <!-- Tab container div -->
     <div class="tab-container">
       <button id="RBV" class="tab">Riffle Bioassessment by Volunteers</button>
       <button id="VSTeM" class="tab">
@@ -222,6 +228,11 @@
       </button>
       <button id="CTLW" class="tab">CT Lake Watch</button>
     </div>
+
+        <!-- Info message div -->
+        <div class="info-message">
+          <p>Click the tabs to change the map.</p>
+        </div>
 
     <div class="header-info">
       <a class="btn btn-info" data-bs-toggle="offcanvas" href="#offcanvasExample" role="button"
@@ -814,7 +825,8 @@ appears from horizontal start (left) of viewport. -->
 
       // if not found
       if (!found) {
-        alert('No match found\nHint: mouse over a stream to see suggested format'); // can i customize this better to direct a better query if it fails?
+        alert(
+        'No match found\nHint: mouse over a stream to see suggested format'); // can i customize this better to direct a better query if it fails?
       }
     }
 
