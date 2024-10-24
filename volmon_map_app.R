@@ -134,7 +134,10 @@ assessed_river <- read_sf(dsn = ".", layer = "CT_305b_Assessed_River_2022") # ca
 mapview(assessed_river)
 st_write(assessed_river, "assessed_river.geojson", driver = "GeoJSON") # export as geojson!
 
-rivers <- st_read("assessed_river.geojson")
+# rivers <- st_read("assessed_river.geojson")
+# rivers$ASSESSME_1 <- gsub("Negro Hill", "Freeman", rivers$ASSESSME_1) # fixed in 2024 layer
+
+
 
 ############vstem data##########################################################
 
