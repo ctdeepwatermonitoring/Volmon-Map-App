@@ -144,7 +144,7 @@
 
       .tab {
         /* tabs will control layer visibility, illusion of being separate maps */
-        background-color: #fff;
+        background-color: #cdcdcd;
         color: #0d2d6c;
         border: 3px solid #0d2d6c;
         padding: 0.5rem 1rem;
@@ -160,6 +160,7 @@
 
       .tab.active {
         border: 3px solid #fff;
+        background-color: #fff;
         /* illusion of it being flush with the map like file tabs when active */
       }
 
@@ -396,9 +397,9 @@ appears from horizontal start (left) of viewport. -->
         <ul class="list-unstyled">
           <li>
             Contact the
-            <a href="#">DEEP Volunteer Water Monitoring Program Coordinator </a>
+            <a href="mailto:deep.volunteerwatermonitoring@ct.gov">DEEP Volunteer Water Monitoring Program Coordinator </a>
           </li>
-          <li>Data retrieved from the <a href="#">Water Quality Portal</a></li>
+          <li>Data retrieved from the <a href="https://www.waterqualitydata.us/">Water Quality Portal</a></li>
         </ul>
       </div>
     </div>
@@ -1030,7 +1031,7 @@ appears from horizontal start (left) of viewport. -->
           month: "long",
         });
         const footerText = document.querySelector("footer p");
-        footerText.innerHTML = `<b>${month}, ${year} | CT DEEP Water Monitoring</b>`;
+        footerText.innerHTML = `<b>${month}, ${year} | CT DEEP Water Monitoring & Assessment</b>`;
       }
     </script>
   </body>
