@@ -144,7 +144,7 @@
 
       .tab {
         /* tabs will control layer visibility, illusion of being separate maps */
-        background-color: #cdcdcd;
+        background-color: #c2c2c2;
         color: #0d2d6c;
         border: 3px solid #0d2d6c;
         padding: 0.5rem 1rem;
@@ -869,6 +869,8 @@ appears from horizontal start (left) of viewport. -->
           .getElementById("search")
           .value.toLowerCase();
 
+          let matchCount = 0; // initialize value for storing matches
+
         let found = false; // default flag to see if stream was found or not
 
         // search by stream name
@@ -883,6 +885,7 @@ appears from horizontal start (left) of viewport. -->
               // zoom to the location of the stream
               map.setView(layer.getBounds().getCenter(), 12); // adjust zoom
               layer.openTooltip(); // open tooltip for more info, this is helpful for when multiple stream segments match
+              matchCount++; // add the match counts
               found = true;
             }
           });
@@ -891,12 +894,17 @@ appears from horizontal start (left) of viewport. -->
         // call the searching functions
         searchInStreams(streams);
         searchInStreams(blueStreams); // this works for both since it is basically the same layer
+        matchCount = matchCount / 2 // divide by 2 because we are double searching and the layers are identical
 
-        // if not found
-        if (!found) {
+        // responses to 
+        if (found) {
           alert(
-            "No match found\nHint: mouse over a stream to see suggested format"
+            `${matchCount} matches found\nHint: zoom out to see all matches`
           ); // can i customize this better to direct a better query if it fails?
+        } else if (!found) {
+          alert(
+            "No matches found\nHint: mouse over a stream to see suggested format"
+          );
         }
       }
 
