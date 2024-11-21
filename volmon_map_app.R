@@ -120,6 +120,7 @@ RBV_merged <- RBV_merged[c("MonitoringLocationIdentifier", "MonitoringLocationNa
 #                          "Year_2017", "Year_2018", "Year_2019", "Year_2020",
                          # "Year_2021", "Year_2022", "Year_2023", "MaxScore")]
 
+RBV_merged$MonitoringLocationName <- gsub("Nergro Hill", "Freeman", RBV_merged$MonitoringLocationName) #needs to be manually fixed
 
 RBV_sf <- RBV_merged %>%
   st_as_sf(coords = c("LongitudeMeasure", "LatitudeMeasure"), crs = 4326)
