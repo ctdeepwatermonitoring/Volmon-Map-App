@@ -209,6 +209,30 @@
         padding: 5px;
       }
 
+      #suggestions {
+        display: none;
+        position: absolute;
+        bottom: 100%;
+        left: 0;
+        width: 100%;
+        background-color: white;
+        border: 1px solid #ccc;
+        border-radius: 5px 5px 0 0;
+        max-height: 150px;
+        overflow-y: auto;
+        z-index: 1000;
+        box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      #suggestions li {
+        padding: 8px;
+        cursor: pointer;
+      }
+
+      #suggestions li:hover {
+        background-color: #f0f0f0;
+      }
+
       .offcanvas-header {
         /* tweaking this bc i have a lot of text :,) */
         width: 500px;
@@ -283,9 +307,10 @@
           <input
             type="text"
             id="search"
-            placeholder="Search by stream or town"
+            placeholder="Search by waterbody..."
           />
-          <button class="btn btn-search" onclick="searchLayer()">Search</button>
+          <button class="btn btn-search">Search</button>
+          <ul id="suggestions" class="dropdown-menu"></ul>
         </div>
       </div>
     </section>
@@ -888,70 +913,89 @@ appears from horizontal start (left) of viewport. -->
         return CTLWsites;
       }
 
-      // search feature. i keep going back and forth about how i want to implement this as there are many options, so i am interested in feedback here
-      // this works pretty well BUT you run into the expected database-esque query issues where the data is stored in a slightly different format
-      // than what the user inputs. for example, searching for "west branch salmon brook" (what everyone calls it) doesnt work because we apparently
-      // wrote the segment name as "salmon brook, west branch". which is silly and annoying! i think i have to trust that a user would then try for a
-      // simplified string e.g. salmon brook or just west branch. the fact that the tooltip opens i think also provides visual feedback on what is actually
-      // matched from the search, so they could discover something is named slightly differently from what they inputted
-      // im also testing it on my colleagues and one person tried to search for "wallingford, ct" which didnt work because thats not how the names are formatted
-      // nor what i expected someone to search (useful feedback for me)
+      // reworking search feature to function with partial matches
+      document.getElementById("search").addEventListener("input", function () {
+        const searchValue = this.value.toLowerCase();
+        const suggestions = document.getElementById("suggestions");
 
-      document
-        .getElementById("search")
-        .addEventListener("keydown", function (event) {
-          if (event.key === "Enter") {
-            // i kept naturally hiting the enter key without thinking and was surpised to have it not work
-            searchLayer(); // so you can do it this way now too
-          }
-        });
+        suggestions.innerHTML = "";
 
-      function searchLayer() {
-        const searchValue = document
-          .getElementById("search")
-          .value.toLowerCase();
+        if (!searchValue) {
+          suggestions.style.display = "none"; // hide if no input
+          return;
+        }
 
-        let matchCount = 0; // initialize value for storing matches
+        // match sites based on active tab
+        const filteredSites = filterSites(searchValue);
+        if (filteredSites.length > 0) {
+          suggestions.style.display = "block"; // show suggestions
+          filteredSites.forEach(function (site) {
+            const suggestionItem = document.createElement("div");
+            suggestionItem.textContent = site.name; // display the original case name
+            suggestionItem.onclick = function () {
+              if (activeTab === "CTLW") {
+                // for CTLW sites, zoom to the site using getLatLng()
+                const latlng = site.layer.getLatLng();
+                map.setView(latlng, 12); // 
+                site.layer.openPopup(); // open the popup for the selected site
+              } else {
+                // for RBV or VSTeM sites, zoom to the layer bounds
+                map.setView(site.layer.getBounds().getCenter(), 12);
+                site.layer.openTooltip(); // open the tooltip 
+              }
 
-        let found = false; // default flag to see if stream was found or not
+              suggestions.innerHTML = "";
+              document.getElementById("search").value = site.name;
+            };
 
-        // search by stream name
-        function searchInStreams(layerGroup) {
-          layerGroup.eachLayer(function (layer) {
-            const segmentName = layer.feature.properties.ASSESSME_1
-              ? layer.feature.properties.ASSESSME_1.toLowerCase()
-              : ""; // so that it matches lower case too
+            // change cursor on hover 
+            suggestionItem.style.cursor = "pointer";
 
-            // if the search includes the name
-            if (segmentName.includes(searchValue)) {
-              // zoom to the location of the stream
-              map.setView(layer.getBounds().getCenter(), 12); // adjust zoom
-              layer.openTooltip(); // open tooltip for more info, this is helpful for when multiple stream segments match
-              matchCount++; // add the match counts
-              found = true;
+            suggestions.appendChild(suggestionItem);
+          });
+        } else {
+          suggestions.style.display = "none"; // hide if no matching suggestions
+        }
+      });
+
+      // filter sites based on active tab and search query
+      function filterSites(query) {
+        let relevantSites = [];
+
+        if (activeTab === "RBV") {
+          // filter only streams for RBV tab
+          streams.eachLayer(function (layer) {
+            const siteName = layer.feature.properties.ASSESSME_1 || "";
+            const siteNameLower = siteName.toLowerCase();
+            if (siteNameLower.includes(query)) {
+              relevantSites.push({ name: siteName, layer: layer });
+            }
+          });
+        } else if (activeTab === "VSTeM") {
+          // filter only blueStreams for VSTeM tab
+          blueStreams.eachLayer(function (layer) {
+            const siteName = layer.feature.properties.ASSESSME_1 || "";
+            const siteNameLower = siteName.toLowerCase();
+            if (siteNameLower.includes(query)) {
+              relevantSites.push({ name: siteName, layer: layer });
+            }
+          });
+        } else if (activeTab === "CTLW") {
+          // filter only CTLWsites for CTLW tab
+          CTLWsites.eachLayer(function (layer) {
+            const siteName =
+              layer.feature.properties.MonitoringLocationName || "";
+            const siteNameLower = siteName.toLowerCase();
+            if (siteNameLower.includes(query)) {
+              relevantSites.push({ name: siteName, layer: layer });
             }
           });
         }
 
-        // call the searching functions
-        searchInStreams(streams);
-        searchInStreams(blueStreams); // this works for both since it is basically the same layer
-        matchCount = matchCount / 2; // divide by 2 because we are double searching and the layers are identical
-
-        // responses to
-        if (found) {
-          alert(
-            `${matchCount} matches found\nHint: zoom out to see all matches`
-          ); // can i customize this better to direct a better query if it fails?
-        } else if (!found) {
-          alert(
-            "No matches found\nHint: mouse over a stream to see suggested format"
-          );
-        }
+        return relevantSites;
       }
 
       // creating legends
-      // am also interested in feedback here on making sure they arent too busy/huge while also communicating all the info
 
       function drawRBVLegend() {
         const legendDiv = document.getElementById("legend");
@@ -1058,7 +1102,7 @@ appears from horizontal start (left) of viewport. -->
         setActiveTab("CTLW");
       });
 
-      // controls the active class on tabs to provide visual feedback
+      // Update active tab and trigger any necessary changes
       function setActiveTab(tabID) {
         // grab all tabs
         const tabs = document.querySelectorAll(".tab");
@@ -1067,10 +1111,12 @@ appears from horizontal start (left) of viewport. -->
           tab.classList.remove("active");
         });
         // add active class
-        const activeTab = document.querySelector(`#${tabID}`);
-        if (activeTab) {
-          activeTab.classList.add("active");
+        const activeTabElement = document.querySelector(`#${tabID}`);
+        if (activeTabElement) {
+          activeTabElement.classList.add("active");
         }
+
+        activeTab = tabID; // Store the active tab for reference in the search function
       }
 
       // footer content
