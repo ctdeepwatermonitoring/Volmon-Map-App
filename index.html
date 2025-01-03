@@ -1,241 +1,182 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, shrink-to-fit=no"
-    />
-    <title>Volmon Map App</title>
-    <!-- Bootstrap CSS first -->
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
-      integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65"
-      crossorigin="anonymous"
-    />
-    <!-- Then Leaflet CSS -->
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
-      integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI="
-      crossorigin=""
-    />
- <!-- rest of custom CSS -->
-    <link rel="stylesheet" href="style.css">
 
-  </head>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <title>Volmon Map App</title>
+  <!-- Bootstrap CSS first -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
+    integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous" />
+  <!-- Then Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
+    integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI=" crossorigin="" />
+  <!-- rest of custom CSS -->
+  <link rel="stylesheet" href="style.css">
 
-  <body>
-    <header>
-      <h1>
-        <a
-          href="https://portal.ct.gov/deep/water/inland-water-monitoring/volunteer-water-monitoring-program"
-          ><img src="graphics/DEEP_Primary_Seal_Reverse_150px.png" width="50px"
-        /></a>
-        Volunteer Monitoring Mapping Application (Beta)
-      </h1>
+</head>
 
-      <!-- Tab container div -->
-      <div class="tab-container">
-        <button id="RBV" class="tab">Riffle Bioassessment by Volunteers</button>
-        <button id="VSTeM" class="tab">
-          Volunteer Stream Temperature Monitoring
-        </button>
-        <button id="CTLW" class="tab">CT Lake Watch</button>
-      </div>
+<body>
+  <header>
+    <h1>
+      <a href="https://portal.ct.gov/deep/water/inland-water-monitoring/volunteer-water-monitoring-program"><img
+          src="graphics/DEEP_Primary_Seal_Reverse_150px.png" width="50px" /></a>
+      Volunteer Monitoring Mapping Application
+    </h1>
 
-      <div class="header-info">
-        <a
-          class="btn btn-info"
-          data-bs-toggle="offcanvas"
-          href="#offcanvasExample"
-          role="button"
-          aria-controls="offcanvasExample"
-        >
-          Map Info
-        </a>
-      </div>
-    </header>
-
-    <!-- full-width row with 0 padding -->
-    <section class="row">
-      <div class="p-0">
-        <!-- Map container with height dynamically calc'd in JS. -->
-        <div id="map"></div>
-
-        <!-- legends will go here -->
-        <div
-          id="legend"
-          class="position-absolute shadow-sm p-2 bg-light square-2"
-        ></div>
-
-        <!-- search box here here -->
-        <div
-          id="search-container"
-          class="position-absolute shadow-sm p-2 bg-light square-2"
-        >
-          <input
-            type="text"
-            id="search"
-            placeholder="Search by waterbody..."
-          />
-          <button class="btn btn-search">Search</button>
-          <ul id="suggestions" class="dropdown-menu"></ul>
-        </div>
-      </div>
-    </section>
-
-    <!-- Full-width row with similar style as header. -->
-    <footer>
-      <!-- Content dynamically generated in JS. -->
-      <p class="text-center"></p>
-    </footer>
-
-    <!-- Off-canvas element outside of container
-appears from horizontal start (left) of viewport. -->
-    <div
-      class="offcanvas offcanvas-start bg-dark text-white"
-      tabindex="-1"
-      id="offcanvasExample"
-      aria-labelledby="offcanvasExampleLabel"
-    >
-      <div class="offcanvas-header">
-        <!-- Button to close off-canvas element. -->
-        <button
-          type="button"
-          class="btn-close ms-auto"
-          data-bs-dismiss="offcanvas"
-          aria-label="Close"
-        ></button>
-        <!-- i find it intuitive to click off the body to close the offcanvas but i may put this back -->
-      </div>
-      <div class="offcanvas-body">
-        <h3 class="py-2">Volunteer Water Monitoring in Connecticut</h3>
-        <p>
-          CT DEEP coordinates a statewide
-          <a
-            href="https://portal.ct.gov/deep/water/inland-water-monitoring/volunteer-water-monitoring-program"
-            >Volunteer Water Monitoring Program</a
-          >
-          that trains volunteers to collect water quality data using a variety
-          of DEEP certified methods.
-          <b
-            >To learn more, or to view monitoring results, click on the
-            corresponding program tab.</b
-          >
-        </p>
-        <hr />
-
-        <h5 class="offcanvas-title" id="offcanvasExampleLabel">
-          Riffle Bioassessment by Volunteers (RBV)
-        </h5>
-        <p>
-          The
-          <a
-            href="https://portal.ct.gov/deep/water/inland-water-monitoring/riffle-bioassessment-by-volunteers-rbv"
-            >RBV program</a
-          >
-          trains volunteers to collect benthic macroinvertebrates from suspected
-          high-quality streams. Click
-          <a
-            href="https://www.reddit.com/r/houseplants/comments/1gbd72n/been_waitingsaving_5_years_for_a_greenhouse_and_i/"
-            >here</a
-          >
-          to view the most recent annual program report. The RBV tab displays
-          past RBV results, categorized by the number of "most wanted" (highly
-          pollution sensitive) taxa found at each site. <br /><br />
-          Sites with four or more "most wanted" (MW) taxa are able to be
-          assessed as fully supporting aquatic life use as part of Connecticut's
-          <a
-            href="https://portal.ct.gov/deep/water/water-quality/water-quality-305b-report-to-congress"
-            >Integrated Water Quality Report to Congress</a
-          >. These sites are displayed as yellow circles on the map, and all
-          other sites are displayed as smaller blue circles.
-          <b>Click on the circles for more information about the site.</b>
-          <br /><br />
-          Areas of the map that are shaded green are predicted to have high
-          water quality.
-          <b
-            >If no assessment (blue or red line) has been made on a stream in a
-            green watershed, that is a great location to target RBV
-            monitoring!</b
-          >
-        </p>
-        <hr />
-
-        <h5 class="offcanvas-title" id="offcanvasExampleLabel">
-          Volunteer Stream Temperature Monitoring (VSTeM) Network
-        </h5>
-        <p>
-          The
-          <a
-            href="https://portal.ct.gov/deep/water/inland-water-monitoring/volunteer-stream-temperature-monitoring-network"
-            >VSTeM Network</a
-          >
-          trains volunteers to collect continuous stream temperature data using
-          temperature loggers. Data from this program is used to support CT DEEP
-          Water Monitoring's larger efforts to map
-          <a
-            href="https://portal.ct.gov/deep/water/inland-water-monitoring/cold-water-stream-habitat-map"
-            >coldwater habitat</a
-          >
-          in the state. <br /><br />
-          The shaded blue areas are watersheds predicted to be coldwater that
-          must be confirmed by temperature data. Sites confirmed to be coldwater
-          are shown as blue circles. Other monitored sites are shown as smaller
-          black circles.
-          <b>Click on the circles for more information about the site.</b>
-        </p>
-        <hr />
-
-        <h5 class="offcanvas-title" id="offcanvasExampleLabel">
-          Connecticut Lake Watch
-        </h5>
-        <p>
-          The
-          <a
-            href="https://portal.ct.gov/deep/water/inland-water-monitoring/connecticut-lake-watch"
-            >CT Lake Watch</a
-          >
-          program trains volunteers to monitor lake and pond water clarity using
-          a Secchi disk and thermometer.
-          <b
-            >To view a report summarizing CT Lake Watch results for each
-            monitored lake, click on the site and follow the link.
-          </b>
-        </p>
-
-        <hr />
-        <h3 class="py-2">Questions?</h3>
-        <ul class="list-unstyled">
-          <li>
-            Contact the
-            <a href="mailto:deep.volunteerwatermonitoring@ct.gov"
-              >DEEP Volunteer Water Monitoring Program Coordinator
-            </a>
-          </li>
-          <li>
-            Data retrieved from the
-            <a href="https://www.waterqualitydata.us/">Water Quality Portal</a>
-          </li>
-        </ul>
-      </div>
+    <!-- Tab container div -->
+    <div class="tab-container">
+      <button id="RBV" class="tab">Riffle Bioassessment by Volunteers</button>
+      <button id="VSTeM" class="tab">
+        Volunteer Stream Temperature Monitoring
+      </button>
+      <button id="CTLW" class="tab">CT Lake Watch</button>
     </div>
 
-    <!-- Bootstrap JS first-->
-    <script
-      src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
-      integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4"
-      crossorigin="anonymous"
-    ></script>
-    <!-- Then Leaflet JS -->
-    <script
-      src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
-      integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM="
-      crossorigin=""
-    ></script>
-    <!-- mapping application js -->
-    <script src="main.js"></script>
-  </body>
+    <div class="header-info">
+      <a class="btn btn-info" data-bs-toggle="offcanvas" href="#offcanvasExample" role="button"
+        aria-controls="offcanvasExample">
+        Map Info
+      </a>
+    </div>
+  </header>
+
+  <!-- full-width row with 0 padding -->
+  <section class="row">
+    <div class="p-0">
+      <!-- Map container with height dynamically calc'd in JS. -->
+      <div id="map"></div>
+
+      <!-- legends will go here -->
+      <div id="legend" class="position-absolute shadow-sm p-2 bg-light square-2"></div>
+
+      <!-- search box here here -->
+      <div id="search-container" class="position-absolute shadow-sm p-2 bg-light square-2">
+        <input type="text" id="search" placeholder="Search by waterbody..." />
+        <button class="btn btn-search">Search</button>
+        <ul id="suggestions" class="dropdown-menu"></ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Full-width row with similar style as header. -->
+  <footer>
+    <!-- Content dynamically generated in JS. -->
+    <p class="text-center"></p>
+  </footer>
+
+  <!-- Off-canvas element outside of container
+appears from horizontal start (left) of viewport. -->
+  <div class="offcanvas offcanvas-start bg-dark text-white" tabindex="-1" id="offcanvasExample"
+    aria-labelledby="offcanvasExampleLabel">
+    <div class="offcanvas-header">
+      <!-- Button to close off-canvas element. -->
+      <button type="button" class="btn-close ms-auto" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+      <!-- i find it intuitive to click off the body to close the offcanvas but i may put this back -->
+    </div>
+    <div class="offcanvas-body">
+      <h3 class="py-2">Volunteer Water Monitoring in Connecticut</h3>
+      <p>
+        CT DEEP coordinates a statewide
+        <a href="https://portal.ct.gov/deep/water/inland-water-monitoring/volunteer-water-monitoring-program">Volunteer
+          Water Monitoring Program</a>
+        that trains volunteers to collect water quality data using a variety
+        of DEEP certified methods.
+        <b>To learn more, or to view monitoring results, click on the
+          corresponding program tab.</b> For the best experience, please view this mapping application on a desktop or
+        larger screen.
+      </p>
+      <hr />
+
+      <h5 class="offcanvas-title" id="offcanvasExampleLabel">
+        Riffle Bioassessment by Volunteers (RBV)
+      </h5>
+      <p>
+        The
+        <a href="https://portal.ct.gov/deep/water/inland-water-monitoring/riffle-bioassessment-by-volunteers-rbv">RBV
+          program</a>
+        trains volunteers to collect benthic macroinvertebrates from suspected
+        high-quality streams. Click
+        <a
+          href="https://www.reddit.com/r/houseplants/comments/1gbd72n/been_waitingsaving_5_years_for_a_greenhouse_and_i/">here</a>
+        to view the most recent annual program report. The RBV tab displays
+        past RBV results, categorized by the number of "most wanted" (highly
+        pollution sensitive) taxa found at each site. <br /><br />
+        Sites with four or more "most wanted" (MW) taxa are able to be
+        assessed as fully supporting aquatic life use as part of Connecticut's
+        <a href="https://portal.ct.gov/deep/water/water-quality/water-quality-305b-report-to-congress">Integrated Water
+          Quality Report to Congress</a>. These sites are displayed as yellow circles on the map, and all
+        other sites are displayed as smaller blue circles.
+        <b>Click on the circles for more information about the site.</b>
+        <br /><br />
+        Areas of the map that are shaded green are predicted to have high
+        water quality.
+        <b>If no assessment (blue or red line) has been made on a stream in a
+          green watershed, that is a great location to target RBV
+          monitoring!</b>
+      </p>
+      <hr />
+
+      <h5 class="offcanvas-title" id="offcanvasExampleLabel">
+        Volunteer Stream Temperature Monitoring (VSTeM) Network
+      </h5>
+      <p>
+        The
+        <a
+          href="https://portal.ct.gov/deep/water/inland-water-monitoring/volunteer-stream-temperature-monitoring-network">VSTeM
+          Network</a>
+        trains volunteers to collect continuous stream temperature data using
+        temperature loggers. Data from this program is used to support CT DEEP
+        Water Monitoring's larger efforts to map
+        <a href="https://portal.ct.gov/deep/water/inland-water-monitoring/cold-water-stream-habitat-map">coldwater
+          habitat</a>
+        in the state. <br /><br />
+        The shaded blue areas are watersheds predicted to be coldwater that
+        must be confirmed by temperature data. Sites confirmed to be coldwater
+        are shown as blue circles. Other monitored sites are shown as smaller
+        black circles.
+        <b>Click on the circles for more information about the site.</b>
+      </p>
+      <hr />
+
+      <h5 class="offcanvas-title" id="offcanvasExampleLabel">
+        Connecticut Lake Watch
+      </h5>
+      <p>
+        The
+        <a href="https://portal.ct.gov/deep/water/inland-water-monitoring/connecticut-lake-watch">CT Lake Watch</a>
+        program trains volunteers to monitor lake and pond water clarity using
+        a Secchi disk and thermometer.
+        <b>To view a report summarizing CT Lake Watch results for each
+          monitored lake, click on the site and follow the link.
+        </b>
+      </p>
+
+      <hr />
+      <h3 class="py-2">Questions?</h3>
+      <ul class="list-unstyled">
+        <li>
+          Contact the
+          <a href="mailto:deep.volunteerwatermonitoring@ct.gov">DEEP Volunteer Water Monitoring Program Coordinator
+          </a>
+        </li>
+        <li>
+          Data retrieved from the
+          <a href="https://www.waterqualitydata.us/">Water Quality Portal</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS first-->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous">
+  </script>
+  <!-- Then Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
+    integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
+  <!-- mapping application js -->
+  <script src="main.js"></script>
+</body>
+
 </html>
