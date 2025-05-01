@@ -112,7 +112,7 @@
         .then(function (data) {
           VSTeMsites = drawVSTeM(data);
           // return a new fetch call and continue the chain
-          return fetch("data/CTLWsites.geojson");
+          return fetch("data/CTLWsites2.geojson");
         })
         .then(function (response) {
           return response.json();
@@ -416,7 +416,8 @@
           },
           onEachFeature: function (feature, layer) {
             // tooltip params
-            const siteName = feature.properties.MonitoringLocationName; // my R code now harmonizes this list of monitoring locations with the list
+            const siteName = feature.properties.MonitoringLocationName;
+            const siteID   = feature.properties.ComID; // my R code now harmonizes this list of monitoring locations with the list
             // that i generated the lake watch reports from. it was semi manually created because the data was uploaded
             // sorta from two different databases that handle the relationship between site IDs and lakes differently
             // one of them is, in my opinion, objectively wrong in how it handles that so i have attempted to fix
@@ -425,7 +426,7 @@
             // these are popups so you can touch the link
             layer.bindPopup(
               `<b>${siteName}</b> <br>
-          <a href = "data/reports/${siteName}.html">View interactive report</a>`,
+          <a href = "https://ctdeepwatermonitoring.github.io/ctlakewatch/reports/${siteID}.html" target="_blank">View interactive report</a>`,
               {} // this is where the bulk of the information is stored/visualized, rather than via symbology or direct WQP download links
             ); // this program has more "true" volunteers ie citizen scientists instead of professionals, so we have tried to make the information digestible for them
             layer.on("mouseover", function () {
