@@ -1,4 +1,8 @@
-# Map 673 Final Project Proposal
+## CT DEEP Voluteer Monitoring Program Mapping Application
+
+https://ctdeepwatermonitoring.github.io/Volmon-Map-App/
+
+## Chloe's Mapping Development Overview
 
 ## Overview
 
