@@ -533,7 +533,7 @@
 
       function drawRBVLegend() {
         const legendDiv = document.getElementById("legend");
-        legendDiv.innerHTML = `<h4>RBV Monitoring (1999 - 2023)</h4>
+        legendDiv.innerHTML = `<h4>RBV Monitoring (1999 - 2024)</h4>
     <span style="color:#FDB515; font-size: 24px;">&#9679;</span> 4 or more most wanted<br>
     <span style="color:#0D2D6C; font-size: 24px;">&#9679;</span> 3 or less most wanted<br>
     <span style="color:#7eaf5d; font-size: 24px;">&#9632;</span> High priority watersheds<br>
