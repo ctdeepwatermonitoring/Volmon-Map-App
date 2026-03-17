@@ -141,6 +141,8 @@ st_write(assessed_river, "assessed_river.geojson", driver = "GeoJSON") # export 
 
 
 ############vstem data##########################################################
+## new wqx3 url, potentially use this then need to swap the column names below
+## vstem <- read.csv("https://www.waterqualitydata.us/wqx3/Result/search?project=CT-VOLMON-VSTEM&mimeType=csv&dataProfile=fullPhysChem&providers=NWIS&providers=STORET")
 
 vstem <- read.csv("https://www.waterqualitydata.us/data/Result/search?project=CT-VOLMON-VSTEM&mimeType=csv&zip=no&dataProfile=resultPhysChem&providers=NWIS&providers=STORET")
 colnames(vstem)
