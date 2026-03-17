@@ -4,6 +4,8 @@ library(lubridate)
 library(tidyr)
 library(mapview)
 
+## RBV geojson for Saugatuck 2024 sample manually edited due two samples in 2024, add condition for two samples at same site in same year to choose the higher count
+
 setwd("C:/Users/edwardsch/Documents/GitHub/Volmon-Map-App/data") #work
 setwd("C:/Users/flizo/Documents/nmp/map673/Volmon-Map-App/data") #personal
 
