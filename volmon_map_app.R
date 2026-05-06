@@ -6,8 +6,7 @@ library(mapview)
 
 ## RBV geojson for Saugatuck 2024 sample manually edited due two samples in 2024, add condition for two samples at same site in same year to choose the higher count
 
-setwd("C:/Users/edwardsch/Documents/GitHub/Volmon-Map-App/data") #work
-setwd("C:/Users/flizo/Documents/nmp/map673/Volmon-Map-App/data") #personal
+setwd("C:/Users/LandryJes/Documents/Volmon-Map-App/data") 
 
 #boundary portion
 
@@ -178,6 +177,9 @@ st_write(vstem_sf , "VSTeMclasses.geojson", driver = "GeoJSON") # export as geoj
 
 ctlw <- read.csv("https://www.waterqualitydata.us/data/Station/search?project=CTLakeWatch&project=Connecticut%20Lake%20Watch&mimeType=csv&zip=no&providers=NWIS&providers=STORET")
 ctlw <- ctlw[!duplicated(ctlw[c("MonitoringLocationName")]), ] # different data source so this is the important identifier
+#### This can be removed next year, changed in WQP, didn't want to wait for it to update!
+ctlw$MonitoringLocationName[ctlw$MonitoringLocationName == "Little Tracys Pond, New Haven County, CT, USA"] <- "Tracys Pond, New Haven County, CT, USA"
+#####
 ctlw_sites <- read.csv("ctlw_stations.csv") # manual relational df for the ctlw report generation
 ctlw_filtered <- ctlw %>%
   filter(MonitoringLocationName %in% ctlw_sites$MonitoringLocationName)
@@ -185,7 +187,7 @@ ctlw_filtered <- ctlw_filtered[c("MonitoringLocationName", "MonitoringLocationId
                "LongitudeMeasure")] # no result info/site category (for now!)
 ctlw_sf <- ctlw_filtered %>%
   st_as_sf(coords = c("LongitudeMeasure", "LatitudeMeasure"), crs = 4326)
-st_write(ctlw_sf , "CTLWsites.geojson", driver = "GeoJSON") # export as geojson!
+st_write(ctlw_sf , "CTLWsites2.geojson", driver = "GeoJSON", append = FALSE) # export as geojson!
   
   
   
