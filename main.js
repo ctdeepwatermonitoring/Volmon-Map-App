@@ -112,7 +112,7 @@
         .then(function (data) {
           VSTeMsites = drawVSTeM(data);
           // return a new fetch call and continue the chain
-          return fetch("data/CTLWsites2.geojson");
+          return fetch("data/CTLWsites3.geojson");
         })
         .then(function (response) {
           return response.json();
