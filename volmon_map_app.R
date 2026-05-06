@@ -187,7 +187,7 @@ ctlw_filtered <- ctlw_filtered[c("MonitoringLocationName", "MonitoringLocationId
                "LongitudeMeasure")] # no result info/site category (for now!)
 ctlw_sf <- ctlw_filtered %>%
   st_as_sf(coords = c("LongitudeMeasure", "LatitudeMeasure"), crs = 4326)
-st_write(ctlw_sf , "CTLWsites2.geojson", driver = "GeoJSON", append = FALSE) # export as geojson!
+st_write(ctlw_sf , "CTLWsites3.geojson", driver = "GeoJSON") # export as geojson!
   
   
   
